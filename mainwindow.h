@@ -118,7 +118,7 @@ public slots:
 
 private slots:
     void on_comboBox_activated(const QString &PMname) {
-        quint8 n = PMname.right(1).toUInt();
+        quint8 n = PMname.rightRef(1).toUInt();
         if (PMname[0] == 'C') n += 10;
         if (n < 20 && FEE.isOnline) {
             FEE.curPM = n;
@@ -141,25 +141,42 @@ private slots:
         } else {
             statusBar()->showMessage(QString::asprintf( "Data read in %.3f ms", start.msecsTo(QDateTime::currentDateTime())/1000. ));
             start = QDateTime::currentDateTime();
-            QFile f("Histograms.csv");
-            if (f.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-                QTextStream out(&f);
-                out << "bin ";
-                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":Ch%02dT:ADC0 :ADC1 ", iCh + 1);
+            QTextStream out;
+            QFile ft("HistogramsTime.csv");
+            if (ft.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
+                out.setDevice(&ft);
+                out << " bin ";
+                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":Ch%02dT", iCh + 1);
+                out << Qt::endl;
+                for (int iBin=-2048; iBin < 2048; ++iBin) {
+                    out << QString::asprintf("%5d", iBin);
+                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d", FEE.data.Ch[iCh].time[iBin & 0xFFF]);
+                    out << Qt::endl;
+                }
+                ft.close();
+            } else return;
+            QFile fa("HistogramsAmpl.csv");
+            if (fa.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
+                out.setDevice(&fa);
+                out << " bin";
+                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":C%02dA0:C%02dA1", iCh + 1, iCh + 1);
                 out << Qt::endl;
                 for (int iBin=-256; iBin <    0; ++iBin) {
                     out << QString::asprintf("%4d", iBin);
-                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":     :%5d:%5d", FEE.data.Ch[iCh].nADC0[-iBin - 1], FEE.data.Ch[iCh].nADC1[-iBin - 1]);
+                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].nADC0[-iBin - 1], FEE.data.Ch[iCh].nADC1[-iBin - 1]);
                     out << Qt::endl;
                 }
                 for (int iBin=   0; iBin < 4096; ++iBin) {
                     out << QString::asprintf("%4d", iBin);
-                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d:%5d", FEE.data.Ch[iCh].time[iBin], FEE.data.Ch[iCh].pADC0[iBin], FEE.data.Ch[iCh].pADC1[iBin]);
+                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].pADC0[iBin], FEE.data.Ch[iCh].pADC1[iBin]);
                     out << Qt::endl;
                 }
-                f.close();
-                statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", dumped to file in %.3f ms", start.msecsTo(QDateTime::currentDateTime())/1000.));
-            }
+                fa.close();
+            } else return;
+            statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", dumped to file in %.3f ms", start.msecsTo(QDateTime::currentDateTime())/1000.));
+            quint16 max = 0, *b = (quint16 *)&FEE.data, *e = b + datasize;
+            for (quint16 *p=b; p<e; ++p) { if (*p > max) max = *p; }
+            statusBar()->showMessage(statusBar()->currentMessage() + ", max: " + QString::number(max));
         }
     }
 
