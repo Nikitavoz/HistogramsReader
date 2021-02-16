@@ -5,7 +5,6 @@
 
 const quint32 datasize = 76800;
 
-
 class FITelectronics: public IPbusTarget {
     Q_OBJECT
 public:
@@ -101,10 +100,10 @@ public slots:
     }
 
     void sync() { //read actual values
-        addTransaction(read, (curPM+1)*0x200 + 0xF5, &curAddress);
-        addTransaction(read, (curPM+1)*0x200 + 0x7E, (quint32 *)&histStatus);
-        addTransaction(read, (curPM+1)*0x200 + 0x7F, (quint32 *)&boardStatus);
-        addTransaction(read, (curPM > 9 ? 0x30 : 0x10) + curPM, (quint32 *)&triggerLinkStatus);
+        addTransaction(read, (curPM + 1)*0x200 + 0xF5, &curAddress);
+        addTransaction(read, (curPM + 1)*0x200 + 0x7E, (quint32 *)&histStatus);
+        addTransaction(read, (curPM + 1)*0x200 + 0x7F, (quint32 *)&boardStatus);
+        addTransaction(read, (curPM > 9 ? 0x30 : 0x10) + curPM % 10, (quint32 *)&triggerLinkStatus);
         if (transceive()) emit statusReady();
     }
 

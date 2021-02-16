@@ -32,6 +32,7 @@ public:
         connect(this, &IPbusTarget::networkError, this, &IPbusTarget::error);
 		connect(this, &IPbusTarget::IPbusError, this, &IPbusTarget::error);
 		connect(this, &IPbusTarget::logicError, this, &IPbusTarget::error);
+        qsocket->bind(QHostAddress::AnyIPv4, localport);
     }
 
     ~IPbusTarget() {
@@ -39,8 +40,9 @@ public:
     }
 
     quint32 readRegister(quint32 address) {
-        addTransaction(read, address, nullptr, 1);
-        return transceive(false) ? response[2] : 0xFFFFFFFF;
+        quint32 data;
+        addTransaction(read, address, &data, 1);
+        return transceive(true) ? data : 0xFFFFFFFF;
     }
 
 signals:
@@ -204,11 +206,11 @@ protected slots:
 public slots:
     void reconnect() {
         updateTimer->stop();
-        //if (qsocket->state() == QAbstractSocket::ConnectedState)
+        if (qsocket->state() == QAbstractSocket::ConnectedState)
             qsocket->close();
-        qsocket->bind(QHostAddress::AnyIPv4, localport);
         qsocket->connectToHost(IPaddress, 50001, QIODevice::ReadWrite, QAbstractSocket::IPv4Protocol);
         qsocket->waitForConnected();
+        updateTimer->start(updatePeriod_ms);
         requestStatus();
     }
 
@@ -218,13 +220,12 @@ public slots:
         responseSize = requestSize;
         if (transceive(false)) { //no transactions to process
             isOnline = true;
-            //updateTimer->stop();
-            QTimer::singleShot(1000, this, [=]() {
+            updateTimer->stop();
+            QTimer::singleShot(QRandomGenerator::global()->bounded(100, 250), this, [=]() {
                 updateTimer->start(updatePeriod_ms);
                 emit IPbusStatusOK();
                 sync();
             });
-
         }
     }
 
