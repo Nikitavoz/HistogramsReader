@@ -40,7 +40,7 @@ public:
     }
 
     quint32 readRegister(quint32 address) {
-        quint32 data;
+        quint32 data = 0xFFFFFFFF;
         addTransaction(read, address, &data, 1);
         return transceive(true) ? data : 0xFFFFFFFF;
     }

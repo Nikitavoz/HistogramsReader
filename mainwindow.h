@@ -66,7 +66,7 @@ public:
             ui->centralwidget->setEnabled(true);
         });
         connect(&FEE, &IPbusTarget::noResponse, this, [=]() {
-            statusBar()->showMessage(FEE.IPaddress + ": no response");
+            statusBar()->showMessage(statusBar()->currentMessage() == "" ? FEE.IPaddress + ": no response" : "");
             ui->centralwidget->setDisabled(true);
         });
         connect(&FEE, &FITelectronics::linksStatusReady, this, [=](quint32 mask) {
@@ -109,6 +109,10 @@ public slots:
         ui->label_icon_trigger->setPixmap(FEE.triggerLinkStatus.linkOK ? Green1 : Red0);
         ui->label_icon_clock->setPixmap(FEE.boardStatus.PLLlocked == 0b1111 && FEE.boardStatus.syncError == 0 ? Green1 : Red0);
         ui->centralwidget->setDisabled(FEE.boardStatus.resetting);
+        if (FEE.boardStatus.resetting)
+            statusBar()->showMessage("PM is resetting");
+        else if (statusBar()->currentMessage() == "PM is resetting")
+            statusBar()->showMessage(FEE.IPaddress + ": online");
         ui->switch_historgamming->setChecked(FEE.histStatus.histOn);
         ui->switch_filter->setChecked(FEE.histStatus.filterOn);
         if (ui->spinBox->value() != FEE.histStatus.BCID) ui->spinBox->setValue(FEE.histStatus.BCID);

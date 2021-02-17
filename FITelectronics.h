@@ -86,17 +86,22 @@ signals:
 
 public slots:
     void checkPMlinks() {
-        quint32 mask = readRegister(0x1E);
+        quint32 maskSPI, maskTrgA, maskTrgC;// = readRegister(0x1E);
+        addTransaction(read, 0x1E, &maskSPI);
+        addTransaction(read, 0x1A, &maskTrgA);
+        addTransaction(read, 0x3A, &maskTrgC);
+        if (!transceive()) return;
         for (quint8 i=0; i<20; ++i) {
-            if (!(mask >> i & 1)) setBit(i, 0x1E, false);
-            if (fabs(readRegister((i+1)*0x200 + 0xFD) * 3. / 65536 - 1.) > 0.2) {
-                mask &= ~(1 << i);
-                clearBit(i, 0x1E, false);
-            }
+            if (!(maskSPI >> i & 1)) setBit(i, 0x1E, false);
+            if (fabs(readRegister((i+1)*0x200 + 0xFD) * 3. / 65536 - 1.) < 0.2) {
+                maskSPI |= 1 << i;
+                if (i > 9) maskTrgC |= 1 << (i - 10);
+                else       maskTrgA |= 1 << i;
+            } else clearBit(i, 0x1E, false);
 		}
-        writeRegister(mask & 0x3FF, 0x1A, false);
-        writeRegister(mask >> 10, 0x3A, false);
-        if (_BitScanForward(&curPM, mask)) emit linksStatusReady(mask);
+        addWordToWrite(0x1A, maskTrgA);
+        addWordToWrite(0x3A, maskTrgC);
+        if (transceive() && _BitScanForward(&curPM, maskSPI)) emit linksStatusReady(maskSPI);
     }
 
     void sync() { //read actual values
