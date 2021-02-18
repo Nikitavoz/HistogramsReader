@@ -56,6 +56,7 @@ public:
         QMenu *networkMenu = menuBar()->addMenu("&Network");
         networkMenu->addAction(QIcon(":/recheck.png"), "&Recheck and default", this, SLOT(recheckTarget()), QKeySequence::Refresh);
         networkMenu->addAction("&Change target IP address...", this, SLOT(changeIP()));
+//        networkMenu->addAction("Test qd", &FEE, &FITelectronics::testSpeed);
 
 //signal-slot conections
         connect(&FEE, &IPbusTarget::networkError, this, [=](QString message) { QMessageBox::warning(this, "Network Error", message); statusBar()->showMessage(message); });
@@ -141,9 +142,9 @@ private slots:
         QDateTime start = QDateTime::currentDateTime();
         quint32 n = FEE.readHistograms();
         if (n != datasize) {
-            statusBar()->showMessage(QString::asprintf( "%.0f%% of data read", n/double(datasize) ));
+            statusBar()->showMessage(QString::asprintf( "%d/%d words read (%.1f%% of data)", n, datasize, n*100./datasize ));
         } else {
-            statusBar()->showMessage(QString::asprintf( "Data read in %.3f ms", start.msecsTo(QDateTime::currentDateTime())/1000. ));
+            statusBar()->showMessage(QString::asprintf( "Data read in %.3f s", start.msecsTo(QDateTime::currentDateTime())/1000. ));
             start = QDateTime::currentDateTime();
             QTextStream out;
             QFile ft("HistogramsTime.csv");
@@ -177,7 +178,7 @@ private slots:
                 }
                 fa.close();
             } else return;
-            statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", dumped to file in %.3f ms", start.msecsTo(QDateTime::currentDateTime())/1000.));
+            statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", dumped to file in %.3f s", start.msecsTo(QDateTime::currentDateTime())/1000.));
             quint16 max = 0, *b = (quint16 *)&FEE.data, *e = b + datasize;
             for (quint16 *p=b; p<e; ++p) { if (*p > max) max = *p; }
             statusBar()->showMessage(statusBar()->currentMessage() + ", max: " + QString::number(max));

@@ -63,21 +63,16 @@ public:
     quint32 readHistograms() {
         updateTimer->stop();
         curAddress = 0;
+        quint32 wordsRead = 0;
         addTransaction(RMWbits, (curPM+1)*0x200 + 0x7E, masks(0xFFFF7FFF, 0));
         addTransaction(write, (curPM+1)*0x200 + 0xF5, &curAddress);
-        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + curAddress, 180);
-        curAddress += 180;
-        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + curAddress, 180);
-        curAddress += 180;
-        for (quint8 i=0; transceive() && i<210; ++i) {
-            addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + curAddress, 182);
-            curAddress += 182;
-            addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + curAddress, 182);
-            curAddress += 182;
-        }
+        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data, 180);
+        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + 180, 180);
+        quint8 qd=6;
+        if (transceive()) wordsRead = 360 + readFast((curPM+1)*0x200 + 0xF6, (quint32 *)&data + 360, datasize - 360, qd);
         if (histStatus.histOn) setBit(15, (curPM+1)*0x200 + 0x7E, false);
         updateTimer->start(updatePeriod_ms);
-        return curAddress;
+        return wordsRead;
     }
 
 signals:
@@ -85,6 +80,19 @@ signals:
     void statusReady();
 
 public slots:
+//    void testSpeed() {
+//        const quint32 blockSize = 364*100;
+//        quint32 tdata[blockSize], stats[16] = {0}, n = 1000;
+//        QDateTime start, finish;
+//        for (quint8 i=1; i<=15; ++i) {
+//            quint8 qd = i;
+//            start = QDateTime::currentDateTime();
+//            for (quint16 j=0; j<n; ++j) stats[i] += (blockSize - readFast(0x7, tdata, blockSize, qd))/364;
+//            finish = QDateTime::currentDateTime();
+//            qDebug() << QString::asprintf("QD=%2d (%2d used): %7.3f s (%5.1f Mbit/s), %3d ppm lost", i, qd, start.msecsTo(finish)/1000., blockSize*0.032*n/start.msecsTo(finish), stats[i]*10);
+//        }
+//    }
+
     void checkPMlinks() {
         quint32 maskSPI, maskTrgA, maskTrgC;// = readRegister(0x1E);
         addTransaction(read, 0x1E, &maskSPI);

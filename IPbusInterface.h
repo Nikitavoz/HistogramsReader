@@ -134,6 +134,38 @@ protected:
 		}
 	}
 
+    quint32 readFast(quint32 address, quint32 *data, quint32 dataSize, quint8 &qdmax) {
+        quint32 *p = data, *e = data + dataSize, chunkSize = 182, *cp, *rp = data;
+        quint8 qd = 0, i, max = 1;
+        transactionsList.clear();
+        request[0] = quint32(PacketHeader(control, 0));
+        request[1] = quint32(TransactionHeader(nonIncrementingRead, chunkSize, 0));
+        request[2] = address;
+        request[3] = quint32(TransactionHeader(nonIncrementingRead, chunkSize, 1));
+        request[4] = address;
+        requestSize = 5;
+        responseSize = chunkSize * 2 + 3;
+        while (p != e) {
+            if (qsocket->bytesAvailable() >= responseSize * wordSize) {
+                qsocket->read(pResponse, responseSize * wordSize);
+                for (i=0, cp=response+2; i<chunkSize; ++i, ++cp) *(p++) = *cp;
+                ++cp; //skipping TA1 header
+                for (i=0; i<chunkSize; ++i, ++cp) *(p++) = *cp;
+                --qd;
+            } else if (qd < qdmax && rp != e) {
+                qsocket->write(pRequest, requestSize * wordSize);
+                ++qd;
+                rp += 2 * chunkSize;
+                if (qd > max) max = qd;
+            } else {
+                if (!qsocket->waitForReadyRead(100)) break;
+            }
+        }
+        resetTransactions();
+        qdmax = max;
+        return p - data;
+    }
+
     bool analyzeResponse() { //check transactions successfulness and copy read data to destination
         for (quint16 j = 1, n = 0; !transactionsList.isEmpty() && j < responseSize; ++j, ++n) {
             TransactionHeader th = response[j];
@@ -221,7 +253,7 @@ public slots:
         if (transceive(false)) { //no transactions to process
             isOnline = true;
             updateTimer->stop();
-            QTimer::singleShot(QRandomGenerator::global()->bounded(100, 250), this, [=]() {
+            QTimer::singleShot(QRandomGenerator::global()->bounded(400, 500), this, [=]() {
                 updateTimer->start(updatePeriod_ms);
                 emit IPbusStatusOK();
                 sync();
