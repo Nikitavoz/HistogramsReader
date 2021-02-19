@@ -90,6 +90,42 @@ public:
         delete ui;
     }
 
+    bool writeFiles() {
+        QTextStream out;
+        QFile ft("HistogramsTime.csv");
+        if (ft.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
+            out.setDevice(&ft);
+            out << " bin ";
+            for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":Ch%02dT", iCh + 1);
+            out << Qt::endl;
+            for (int iBin=-2048; iBin < 2048; ++iBin) {
+                out << QString::asprintf("%5d", iBin);
+                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d", FEE.data.Ch[iCh].time[iBin & 0xFFF]);
+                out << Qt::endl;
+            }
+            ft.close();
+        } else return false;
+        QFile fa("HistogramsAmpl.csv");
+        if (fa.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
+            out.setDevice(&fa);
+            out << " bin";
+            for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":C%02dA0:C%02dA1", iCh + 1, iCh + 1);
+            out << Qt::endl;
+            for (int iBin=-256; iBin <    0; ++iBin) {
+                out << QString::asprintf("%4d", iBin);
+                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].nADC0[-iBin - 1], FEE.data.Ch[iCh].nADC1[-iBin - 1]);
+                out << Qt::endl;
+            }
+            for (int iBin=   0; iBin < 4096; ++iBin) {
+                out << QString::asprintf("%4d", iBin);
+                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].pADC0[iBin], FEE.data.Ch[iCh].pADC1[iBin]);
+                out << Qt::endl;
+            }
+            fa.close();
+        } else return false;
+        return true;
+    }
+
 public slots:
     void recheckTarget() {
         statusBar()->showMessage(FEE.IPaddress + ": status requested...");
@@ -139,49 +175,32 @@ private slots:
     void on_button_reset_clicked() { FEE.reset(); }
 
     void on_button_read_clicked() {
-        QDateTime start = QDateTime::currentDateTime();
+        QDateTime start = QDateTime::currentDateTime(), end;
         quint32 n = FEE.readHistograms();
         if (n != datasize) {
             statusBar()->showMessage(QString::asprintf( "%d/%d words read (%.1f%% of data)", n, datasize, n*100./datasize ));
         } else {
-            statusBar()->showMessage(QString::asprintf( "Data read in %.3f s", start.msecsTo(QDateTime::currentDateTime())/1000. ));
-            start = QDateTime::currentDateTime();
-            QTextStream out;
-            QFile ft("HistogramsTime.csv");
-            if (ft.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-                out.setDevice(&ft);
-                out << " bin ";
-                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":Ch%02dT", iCh + 1);
-                out << Qt::endl;
-                for (int iBin=-2048; iBin < 2048; ++iBin) {
-                    out << QString::asprintf("%5d", iBin);
-                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d", FEE.data.Ch[iCh].time[iBin & 0xFFF]);
-                    out << Qt::endl;
-                }
-                ft.close();
-            } else return;
-            QFile fa("HistogramsAmpl.csv");
-            if (fa.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-                out.setDevice(&fa);
-                out << " bin";
-                for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":C%02dA0:C%02dA1", iCh + 1, iCh + 1);
-                out << Qt::endl;
-                for (int iBin=-256; iBin <    0; ++iBin) {
-                    out << QString::asprintf("%4d", iBin);
-                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].nADC0[-iBin - 1], FEE.data.Ch[iCh].nADC1[-iBin - 1]);
-                    out << Qt::endl;
-                }
-                for (int iBin=   0; iBin < 4096; ++iBin) {
-                    out << QString::asprintf("%4d", iBin);
-                    for (int iCh=0; iCh<12; ++iCh) out << QString::asprintf(":%5d:%5d", FEE.data.Ch[iCh].pADC0[iBin], FEE.data.Ch[iCh].pADC1[iBin]);
-                    out << Qt::endl;
-                }
-                fa.close();
-            } else return;
-            statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", dumped to file in %.3f s", start.msecsTo(QDateTime::currentDateTime())/1000.));
+            end = QDateTime::currentDateTime();
+            statusBar()->showMessage(QString::asprintf("Data:  %.3fs", start.msecsTo(end)/1000.));
+            start = end;
+            bool success = writeFiles();
+            end = QDateTime::currentDateTime();
+            if (success) statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", files:  %.3fs", start.msecsTo(end)/1000.));
+            start = end;
             quint16 max = 0, *b = (quint16 *)&FEE.data, *e = b + datasize;
-            for (quint16 *p=b; p<e; ++p) { if (*p > max) max = *p; }
-            statusBar()->showMessage(statusBar()->currentMessage() + ", max: " + QString::number(max));
+            for (quint16 *p=b; p<e; ++p) if (*p > max) max = *p;
+            FEE.calcStats();
+            end = QDateTime::currentDateTime();
+            statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", stats: %.3fs, max: %d", start.msecsTo(end)/1000., max));
+            qDebug() << QString::asprintf("Ch |Time: sum    mean    RMS |ADC0: sum   mean    RMS |ADC1: sum   mean    RMS");
+//          qDebug() << QString::asprintf("00 |268431360 -2048.0 2047.0 |285208320 4096.0 2176.0 |285208320 4096.0 2176.0");
+            for (quint8 iCh=0; iCh<12; ++iCh) {
+                qDebug() << QString::asprintf("%02d |%9d % 7.1f %6.1f |%9d %6.1f %6.1f |%9d %6.1f %6.1f", iCh,
+                    FEE.statsCh[iCh][hTime].sum, FEE.statsCh[iCh][hTime].mean, FEE.statsCh[iCh][hTime].RMS,
+                    FEE.statsCh[iCh][hADC0].sum, FEE.statsCh[iCh][hADC0].mean, FEE.statsCh[iCh][hADC0].RMS,
+                    FEE.statsCh[iCh][hADC1].sum, FEE.statsCh[iCh][hADC1].mean, FEE.statsCh[iCh][hADC1].RMS
+                );
+            }
         }
     }
 

@@ -4,6 +4,7 @@
 #include "IPbusInterface.h"
 
 const quint32 datasize = 76800;
+enum histType {hADC0 = 0, hADC1 = 1, hTime = 2};
 
 class FITelectronics: public IPbusTarget {
     Q_OBJECT
@@ -56,6 +57,11 @@ public:
         } Ch[12];
     } data;
 
+    struct TypeStats {
+        quint32 sum;
+        double mean, RMS;
+    } statsCh[12][3];
+
     FITelectronics(): IPbusTarget(50011) {
         connect(this, &IPbusTarget::IPbusStatusOK, this, &FITelectronics::checkPMlinks);
     }
@@ -73,6 +79,35 @@ public:
         if (histStatus.histOn) setBit(15, (curPM+1)*0x200 + 0x7E, false);
         updateTimer->start(updatePeriod_ms);
         return wordsRead;
+    }
+
+    void calcStats() {
+        quint8 iCh;
+        qint16 iBin;
+        quint16 v;
+        quint32 s;
+        double m, r;
+        for (iCh=0; iCh<12; ++iCh) {
+            s = 0; m = r = 0;
+            for (iBin=-2048; iBin < 2048; ++iBin) { v = data.Ch[iCh].time[iBin & 0xFFF]; s += v; m += v*iBin; r += v*iBin*iBin; }
+            statsCh[iCh][hTime].sum = s;
+            statsCh[iCh][hTime].mean = m /= s;
+            statsCh[iCh][hTime].RMS = sqrt(r/s - m*m);
+
+            s = 0; m = r = 0;
+            for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC0[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC0[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+            statsCh[iCh][hADC0].sum = s;
+            statsCh[iCh][hADC0].mean = m /= s;
+            statsCh[iCh][hADC0].RMS = sqrt(r/s - m*m);
+
+            s = 0; m = r = 0;
+            for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC1[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC1[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+            statsCh[iCh][hADC1].sum = s;
+            statsCh[iCh][hADC1].mean = m /= s;
+            statsCh[iCh][hADC1].RMS = sqrt(r/s - m*m);
+        }
     }
 
 signals:

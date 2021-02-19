@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName("INR");
     QCoreApplication::setApplicationName("HistogramReader");
-    QCoreApplication::setApplicationVersion("1.4");
+    QCoreApplication::setApplicationVersion("1.5");
     QApplication::setStyle(QStyleFactory::create("windowsvista"));
     MainWindow w;
     w.show();
