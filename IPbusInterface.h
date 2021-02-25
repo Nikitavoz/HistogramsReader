@@ -94,6 +94,10 @@ protected:
     void addWordToWrite(quint32 address, quint32 value) { addTransaction(write, address, &value, 1); }
 
 	bool transceive(bool analyze = true) { //send request, wait for response, receive it and check correctness
+        if (requestSize <= 1) {
+            emit logicError("Empty request");
+            return false;
+        }
 		qint32 n = qint32(qsocket->write(pRequest, requestSize * wordSize));
 		if (n < 0) {
 			emit networkError("Socket write error: " + qsocket->errorString());
