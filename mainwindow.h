@@ -192,13 +192,21 @@ private slots:
             FEE.calcStats();
             end = QDateTime::currentDateTime();
             statusBar()->showMessage(statusBar()->currentMessage() + QString::asprintf(", stats: %.3fs, max: %d", start.msecsTo(end)/1000., max));
-            qDebug() << QString::asprintf("Ch |Time: sum    mean    RMS |ADC0: sum   mean    RMS |ADC1: sum   mean    RMS");
-//          qDebug() << QString::asprintf("00 |268431360 -2048.0 2047.0 |285208320 4096.0 2176.0 |285208320 4096.0 2176.0");
+            qDebug() << QString::asprintf("Ch |Time: sum    mean    RMS |ADC0: sum   mean    RMS |ADC1: sum   mean    RMS |Ampl: sum   mean    RMS");
+//          qDebug() << QString::asprintf("00 |268431360 -2048.0 2047.0 |285208320 4096.0 2176.0 |285208320 4096.0 2176.0 |570416640 4096.0 2176.0");
             for (quint8 iCh=0; iCh<12; ++iCh) {
-                qDebug() << QString::asprintf("%02d |%9d % 7.1f %6.1f |%9d %6.1f %6.1f |%9d %6.1f %6.1f", iCh + 1,
+//                quint32 totalSum = FEE.statsCh[iCh][hADC0].sum + FEE.statsCh[iCh][hADC1].sum;
+//                double weightedMean = (FEE.statsCh[iCh][hADC0].sum * FEE.statsCh[iCh][hADC0].mean + FEE.statsCh[iCh][hADC1].sum * FEE.statsCh[iCh][hADC1].mean) / totalSum;
+//                double combinedRMS = sqrt((
+//                    (pow(FEE.statsCh[iCh][hADC0].RMS, 2) + pow(FEE.statsCh[iCh][hADC0].mean, 2)) * FEE.statsCh[iCh][hADC0].sum
+//                    +
+//                    (pow(FEE.statsCh[iCh][hADC1].RMS, 2) + pow(FEE.statsCh[iCh][hADC1].mean, 2)) * FEE.statsCh[iCh][hADC1].sum
+//                ) / totalSum - pow(weightedMean, 2));
+                qDebug() << QString::asprintf("%02d |%9d % 7.1f %6.1f |%9d %6.1f %6.1f |%9d %6.1f %6.1f |%9d %6.1f %6.1f", iCh + 1,
                     FEE.statsCh[iCh][hTime].sum, FEE.statsCh[iCh][hTime].mean, FEE.statsCh[iCh][hTime].RMS,
                     FEE.statsCh[iCh][hADC0].sum, FEE.statsCh[iCh][hADC0].mean, FEE.statsCh[iCh][hADC0].RMS,
-                    FEE.statsCh[iCh][hADC1].sum, FEE.statsCh[iCh][hADC1].mean, FEE.statsCh[iCh][hADC1].RMS
+                    FEE.statsCh[iCh][hADC1].sum, FEE.statsCh[iCh][hADC1].mean, FEE.statsCh[iCh][hADC1].RMS,
+                    FEE.statsCh[iCh][hAmpl].sum, FEE.statsCh[iCh][hAmpl].mean, FEE.statsCh[iCh][hAmpl].RMS
                 );
             }
         }

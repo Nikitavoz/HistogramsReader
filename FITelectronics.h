@@ -4,7 +4,7 @@
 #include "IPbusInterface.h"
 
 const quint32 datasize = 76800;
-enum histType {hADC0 = 0, hADC1 = 1, hTime = 2};
+enum histType {hADC0 = 0, hADC1 = 1, hTime = 2, hAmpl = 3};
 
 class FITelectronics: public IPbusTarget {
     Q_OBJECT
@@ -60,7 +60,7 @@ public:
     struct TypeStats {
         quint32 sum;
         double mean, RMS;
-    } statsCh[12][3];
+    } statsCh[12][4];
 
     FITelectronics(): IPbusTarget(50011) {
         connect(this, &IPbusTarget::IPbusStatusOK, this, &FITelectronics::checkPMlinks);
@@ -97,6 +97,9 @@ public:
             s = 0; m = r = 0;
             for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC0[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
             for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC0[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+            statsCh[iCh][hAmpl].sum = s;
+            statsCh[iCh][hAmpl].mean = m;
+            statsCh[iCh][hAmpl].RMS = r;
             statsCh[iCh][hADC0].sum = s;
             statsCh[iCh][hADC0].mean = m /= s;
             statsCh[iCh][hADC0].RMS = sqrt(r/s - m*m);
@@ -104,6 +107,11 @@ public:
             s = 0; m = r = 0;
             for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC1[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
             for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC1[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+            statsCh[iCh][hAmpl].sum += s;
+            statsCh[iCh][hAmpl].mean += m;
+            statsCh[iCh][hAmpl].RMS += r;
+            statsCh[iCh][hAmpl].mean /= statsCh[iCh][hAmpl].sum;
+            statsCh[iCh][hAmpl].RMS = sqrt(statsCh[iCh][hAmpl].RMS / statsCh[iCh][hAmpl].sum - pow(statsCh[iCh][hAmpl].mean, 2));
             statsCh[iCh][hADC1].sum = s;
             statsCh[iCh][hADC1].mean = m /= s;
             statsCh[iCh][hADC1].RMS = sqrt(r/s - m*m);
