@@ -4,7 +4,8 @@
 #include <QtNetwork>
 #include "IPbusHeaders.h"
 
-const quint16 maxPacket = 368; //368 words, limit from ethernet MTU of 1500 bytes
+const quint16 maxPacket = 368, //368 words, limit from Ethernet MTU of 1500 bytes
+              maxPayload = maxPacket - 3; //1 word for packet header and 2 words for transaction headers (maximum 255 words in one transaction)
 
 class IPbusTarget: public QObject {
     Q_OBJECT
@@ -138,35 +139,51 @@ protected:
 		}
 	}
 
-    quint32 readFast(quint32 address, quint32 *data, quint32 dataSize, quint8 &qdmax) {
-        quint32 *p = data, *e = data + dataSize, chunkSize = 182, *cp, *rp = data;
-        quint8 qd = 0, i, max = 1;
-        transactionsList.clear();
+    quint32 readFast(quint32 address, quint32 *data, quint32 dataSize, quint8 qdmax = 5) {
+        const quint32 *e = data + dataSize; //end of data pointer
+        quint32
+            *rp = data, //pointer to next quint32 of data to request
+            *p = data, //pointer to next quint32 of data to save
+            *cp, //pointer to next quint32 of response to copy data from
+            offset = dataSize % maxPayload; //payload size for the first packet
+        quint8 qd = 0, i;
         request[0] = quint32(PacketHeader(control, 0));
-        request[1] = quint32(TransactionHeader(nonIncrementingRead, chunkSize, 0));
         request[2] = address;
-        request[3] = quint32(TransactionHeader(nonIncrementingRead, chunkSize, 1));
         request[4] = address;
-        requestSize = 5;
-        responseSize = chunkSize * 2 + 3;
-        while (p != e) {
-            if (qsocket->bytesAvailable() >= responseSize * wordSize) {
-                qsocket->read(pResponse, responseSize * wordSize);
-                for (i=0, cp=response+2; i<chunkSize; ++i, ++cp) *(p++) = *cp;
-                ++cp; //skipping TA1 header
-                for (i=0; i<chunkSize; ++i, ++cp) *(p++) = *cp;
-                --qd;
-            } else if (qd < qdmax && rp != e) {
-                qsocket->write(pRequest, requestSize * wordSize);
-                ++qd;
-                rp += 2 * chunkSize;
-                if (qd > max) max = qd;
-            } else {
-                if (!qsocket->waitForReadyRead(100)) break;
+        if (offset) {
+            bool lo = offset > 255; //long offset, needs 2 transactions
+            request[1]         = TransactionHeader(nonIncrementingRead, lo ? 183 : offset, 0);
+            if (lo) request[3] = TransactionHeader(nonIncrementingRead,      offset - 183, 1);
+            requestSize = lo ? 5 : 3;
+            responseSize = offset + (lo ? 3 : 2);
+            qsocket->write(pRequest, requestSize * wordSize);
+            rp += offset;
+            if (!qsocket->waitForReadyRead(100)) return 0;
+            qsocket->read(pResponse, responseSize * wordSize);
+            for         (i=0, cp=response+  2; i < (lo ? 183 : offset); ++i, ++cp) *(p++) = *cp;
+            if (lo) for (i=0, cp=response+186; i <      (offset - 183); ++i, ++cp) *(p++) = *cp;
+        }
+        if (dataSize > offset) {
+            request[1] = TransactionHeader(nonIncrementingRead, 183, 0);
+            request[3] = TransactionHeader(nonIncrementingRead, 182, 1);
+            requestSize = 5;
+            responseSize = maxPacket;
+            while (p != e) {
+                if (qsocket->bytesAvailable() >= responseSize * wordSize) {
+                    qsocket->read(pResponse, responseSize * wordSize);
+                    for (i=0, cp=response+  2; i<183; ++i, ++cp) *(p++) = *cp;
+                    for (i=0, cp=response+186; i<182; ++i, ++cp) *(p++) = *cp;
+                    --qd;
+                } else if (qd < qdmax && rp != e) {
+                    qsocket->write(pRequest, requestSize * wordSize);
+                    ++qd;
+                    rp += maxPayload;
+                } else {
+                    if (!qsocket->waitForReadyRead(100)) break;
+                }
             }
         }
         resetTransactions();
-        qdmax = max;
         return p - data;
     }
 
@@ -256,12 +273,8 @@ public slots:
         responseSize = requestSize;
         if (transceive(false)) { //no transactions to process
             isOnline = true;
-            updateTimer->stop();
-            QTimer::singleShot(QRandomGenerator::global()->bounded(400, 500), this, [=]() {
-                updateTimer->start(updatePeriod_ms);
-                emit IPbusStatusOK();
-                sync();
-            });
+			emit IPbusStatusOK();
+			sync();
         }
     }
 

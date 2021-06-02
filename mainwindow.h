@@ -44,7 +44,8 @@ public:
         allWidgets = ui->centralwidget->findChildren<QWidget *>();
 
 //initial scaling (a label with fontsize 10 (Calibri) has pixelsize of 13 without system scaling and e.g. 20 at 150% scaling so widgets size should be recalculated)
-        sz = ui->label_trigger->fontInfo().pixelSize();
+        //sz = ui->label_trigger->fontInfo().pixelSize();
+        sz = ui->centralwidget->findChild<QLabel *>()->fontInfo().pixelSize();
         resize(lround(width()*sz/13.), lround(height()*sz/13.)); //mainWindow
         setMaximumSize(size());
         setMinimumSize(size());
@@ -56,7 +57,7 @@ public:
         QMenu *networkMenu = menuBar()->addMenu("&Network");
         networkMenu->addAction(QIcon(":/recheck.png"), "&Recheck and default", this, SLOT(recheckTarget()), QKeySequence::Refresh);
         networkMenu->addAction("&Change target IP address...", this, SLOT(changeIP()));
-//        networkMenu->addAction("Test qd", &FEE, &FITelectronics::testSpeed);
+        //networkMenu->addAction("Test qd", &FEE, &FITelectronics::testSpeed);
 
 //signal-slot conections
         connect(&FEE, &IPbusTarget::networkError, this, [=](QString message) { QMessageBox::warning(this, "Network Error", message); statusBar()->showMessage(message); });

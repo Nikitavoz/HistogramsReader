@@ -72,10 +72,7 @@ public:
         quint32 wordsRead = 0;
         addTransaction(RMWbits, (curPM+1)*0x200 + 0x7E, masks(0xFFFF7FFF, 0));
         addTransaction(write, (curPM+1)*0x200 + 0xF5, &curAddress);
-        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data, 180);
-        addTransaction(nonIncrementingRead, (curPM+1)*0x200 + 0xF6, (quint32 *)&data + 180, 180);
-        quint8 qd=6;
-        if (transceive()) wordsRead = 360 + readFast((curPM+1)*0x200 + 0xF6, (quint32 *)&data + 360, datasize - 360, qd);
+        if (transceive()) wordsRead = readFast((curPM+1)*0x200 + 0xF6, (quint32 *)&data, datasize, 6);
         if (histStatus.histOn) setBit(15, (curPM+1)*0x200 + 0x7E, false);
         updateTimer->start(updatePeriod_ms);
         return wordsRead;
