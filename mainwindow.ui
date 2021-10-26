@@ -1217,6 +1217,27 @@
         <string>Save...</string>
        </property>
       </widget>
+      <widget class="QWidget" name="tab_3">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;XX&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <attribute name="title">
+        <string>Calibration Log</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="calTextOutput">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>941</width>
+          <height>481</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
     <item row="0" column="0">

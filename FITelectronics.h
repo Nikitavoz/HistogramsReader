@@ -244,6 +244,31 @@ public slots:
     void switchBCfilter     (bool on) { if (on) setBit(12, iBd*0x200 + 0x7E); else clearBit(12, iBd*0x200 + 0x7E); }
     void setBC(int id) { if (id >= 0 && id < 0xDEC) writeNbits(iBd*0x200 + 0x7E, id, 12); }
     void selectTriggerHistogram(quint8 n) { writeNbits(0x0E, n, 4, 4, false); if (n && TCMmode.selectableHist != n) reset(); }
+
+    bool readTimeAlignment(quint32* data) {
+        addTransaction(read, (curPM+1)*0x200 + 1, data, 12);
+        return transceive();
+    }
+    bool writeTimeAlignment(quint32* data) {
+        addTransaction(write, (curPM+1)*0x200 + 1, data, 12);
+        return transceive();
+    }
+
+    bool readADCRegisters(quint32 *data) {
+        addTransaction(read, (curPM+1)*0x200+0x7F+1,data, 12*4);
+        return transceive();
+    }
+
+    bool writeADCRegisters(quint32 *data) {
+        addTransaction(write, (curPM+1)*0x200+0x7F+1,data, 12*4);
+        return transceive();
+    }
+
+    bool readCounters(quint32 *data) {
+        addTransaction(read, (curPM+1)*0x200+0xC0, data, 24);
+        return transceive();
+    }
+
 };
 
 #endif // FITELECTRONICS_H
