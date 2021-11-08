@@ -2,14 +2,14 @@
 #define SWITCH_H
 
 #include <QtWidgets>
-const QColor OKcolor("#b0d959"), notOKcolor("#ff2c26");
+const QColor OKcolor(0xb0d959), notOKcolor(0xff2c26);
 
 class Switch : public QAbstractButton {
     Q_OBJECT
     Q_PROPERTY(int offset READ offset WRITE setOffset)
     Q_PROPERTY(QBrush brush READ brush WRITE setBrush)
     Q_PROPERTY(bool SwitchOnClick READ getSwitchOnClick WRITE setSwitchOnClick)
-    bool _switch, _switchOnClick, _orientation;
+    bool _switch, _switchOnClick = false, _orientation;
     qreal _opacity;
     int _x, _y, _margin;
     QBrush _thumb, _brush;
@@ -19,10 +19,11 @@ public:
     Switch(QWidget* parent = nullptr, const QBrush &brush = OKcolor):
         QAbstractButton(parent),
         _switch(false),
+        _switchOnClick(false),
         _orientation(false),
         _opacity(0.000),
         _margin(3),
-        _thumb("#ff2c26"),
+        _thumb(0xff2c26),
         _anim(new QPropertyAnimation(this, "offset", this))
     {
         setMinimumHeight(_orientation ? 12 : 18);
@@ -68,7 +69,7 @@ public:
             setOffset(_orientation ? _margin : height() - width() + _margin);
             _anim->setEndValue(offset());
         }
-		_anim->setDuration(200);
+        _anim->setDuration(200);
         _anim->start();
         if(!this->getSwitchOnClick()) this->setChecked(_switch);
     }

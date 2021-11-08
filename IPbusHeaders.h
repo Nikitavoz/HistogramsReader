@@ -21,7 +21,7 @@ struct PacketHeader {
         ProtocolVersion = 2;
     }
     PacketHeader(const quint32 &word) {memcpy(this, &word, wordSize);}
-    operator quint32() {return *reinterpret_cast<quint32 *>(this);}
+    operator quint32() const {return *reinterpret_cast<const quint32 *>(this);}
 };
 
 enum TransactionType {
@@ -61,6 +61,11 @@ struct TransactionHeader {
             default : return "unknown Info Code";
         }
     }
+};
+
+struct Transaction {
+    TransactionHeader *requestHeader, *responseHeader;
+    quint32 *address, *data;
 };
 
 struct StatusPacket {

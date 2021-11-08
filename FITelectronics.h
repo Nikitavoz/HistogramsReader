@@ -27,7 +27,7 @@ public:
             resetting : 1,
                       :12;
     } boardStatus;
-    struct HDMIlinkStatus {
+    struct TRGsyncStatus {
         quint32
             line0delay          : 5,
             line0signalLost     : 1,
@@ -63,7 +63,7 @@ public:
     } statsCh[12][4];
 
     FITelectronics(): IPbusTarget(50011) {
-        connect(this, &IPbusTarget::IPbusStatusOK, this, &FITelectronics::checkPMlinks);
+        connect(this, &IPbusTarget::IPbusStatusOK, this, [=]() { checkPMlinks(false); });
     }
 
     quint32 readHistograms() {
@@ -71,29 +71,49 @@ public:
         curAddress = 0;
         quint32 wordsRead = 0;
         addTransaction(RMWbits, (curPM+1)*0x200 + 0x7E, masks(0xFFFF7FFF, 0));
-        addTransaction(write, (curPM+1)*0x200 + 0xF5, &curAddress);
+        addWordToWrite((curPM+1)*0x200 + 0xF5, curAddress);
         if (transceive()) wordsRead = readFast((curPM+1)*0x200 + 0xF6, (quint32 *)&data, datasize, 6);
         if (histStatus.histOn) setBit(15, (curPM+1)*0x200 + 0x7E, false);
         updateTimer->start(updatePeriod_ms);
         return wordsRead;
     }
 
-    void calcStats() {
+    void calcStats(qint16 timeLower[12], qint16 timeUpper[12], qint16 chargeLower[12], qint16 chargeUpper[12]) {
         quint8 iCh;
         qint16 iBin;
         quint16 v;
         quint32 s;
         double m, r;
+
+        qint16 chNlower, chNupper, chPlower, chPupper;
+
         for (iCh=0; iCh<12; ++iCh) {
+
             s = 0; m = r = 0;
-            for (iBin=-2048; iBin < 2048; ++iBin) { v = data.Ch[iCh].time[iBin & 0xFFF]; s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin=timeLower[iCh]; iBin < timeUpper[iCh]; ++iBin) { v = data.Ch[iCh].time[iBin & 0xFFF]; s += v; m += v*iBin; r += v*iBin*iBin; }
             statsCh[iCh][hTime].sum = s;
             statsCh[iCh][hTime].mean = m /= s;
             statsCh[iCh][hTime].RMS = sqrt(r/s - m*m);
 
             s = 0; m = r = 0;
-            for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC0[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
-            for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC0[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+
+            if(chargeLower[iCh] < 0 && chargeUpper[iCh] < 0) {
+                chNlower = chargeLower[iCh];
+                chNupper = chargeUpper[iCh];
+                chPlower = chPupper = 0;
+            } else if(chargeLower[iCh] < 0 && chargeUpper[iCh] >= 0) {
+                chNlower = chargeLower[iCh];
+                chNupper = 0;
+                chPlower = 0;
+                chPupper = chargeUpper[iCh];
+            } else if(chargeLower[iCh] >= 0 && chargeUpper[iCh] >= 0){
+                chNlower = chNupper = 0;
+                chPlower = chargeLower[iCh];
+                chPupper = chargeUpper[iCh];
+            }
+
+            for (iBin= chNlower; iBin < chNupper; ++iBin) { v = data.Ch[iCh].nADC0[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin= chPlower; iBin < chPupper; ++iBin) { v = data.Ch[iCh].pADC0[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
             statsCh[iCh][hAmpl].sum = s;
             statsCh[iCh][hAmpl].mean = m;
             statsCh[iCh][hAmpl].RMS = r;
@@ -102,8 +122,8 @@ public:
             statsCh[iCh][hADC0].RMS = sqrt(r/s - m*m);
 
             s = 0; m = r = 0;
-            for (iBin= -256; iBin <    0; ++iBin) { v = data.Ch[iCh].nADC1[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
-            for (iBin=    0; iBin < 4096; ++iBin) { v = data.Ch[iCh].pADC1[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin= chNlower; iBin < chNupper; ++iBin) { v = data.Ch[iCh].nADC1[-iBin - 1];   s += v; m += v*iBin; r += v*iBin*iBin; }
+            for (iBin= chPlower; iBin < chPupper; ++iBin) { v = data.Ch[iCh].pADC1[iBin];        s += v; m += v*iBin; r += v*iBin*iBin; }
             statsCh[iCh][hAmpl].sum += s;
             statsCh[iCh][hAmpl].mean += m;
             statsCh[iCh][hAmpl].RMS += r;
@@ -133,23 +153,49 @@ public slots:
 //        }
 //    }
 
-    void checkPMlinks() {
-        quint32 maskSPI, maskTrgA, maskTrgC;// = readRegister(0x1E);
+//    void checkPMlinks() {
+//        quint32 maskSPI, maskTrgA, maskTrgC;// = readRegister(0x1E);
+//        addTransaction(read, 0x1E, &maskSPI);
+//        addTransaction(read, 0x1A, &maskTrgA);
+//        addTransaction(read, 0x3A, &maskTrgC);
+//        if (!transceive()) return;
+//        for (quint8 i=0; i<20; ++i) {
+//            if (!(maskSPI >> i & 1)) setBit(i, 0x1E, false);
+//            if (fabs(readRegister((i+1)*0x200 + 0xFD) * 3. / 65536 - 1.) < 0.2) {
+//                maskSPI |= 1 << i;
+//                if (i > 9) maskTrgC |= 1 << (i - 10);
+//                else       maskTrgA |= 1 << i;
+//            } else clearBit(i, 0x1E, false);
+//		}
+//        addWordToWrite(0x1A, maskTrgA);
+//        addWordToWrite(0x3A, maskTrgC);
+//        if (transceive() && _BitScanForward(&curPM, maskSPI)) emit linksStatusReady(maskSPI);
+//    }
+
+    void checkPMlinks(bool forced = false) {
+        quint32 maskSPI, maskTrgA, maskTrgC, voltage;
         addTransaction(read, 0x1E, &maskSPI);
         addTransaction(read, 0x1A, &maskTrgA);
         addTransaction(read, 0x3A, &maskTrgC);
         if (!transceive()) return;
-        for (quint8 i=0; i<20; ++i) {
-            if (!(maskSPI >> i & 1)) setBit(i, 0x1E, false);
-            if (fabs(readRegister((i+1)*0x200 + 0xFD) * 3. / 65536 - 1.) < 0.2) {
-                maskSPI |= 1 << i;
-                if (i > 9) maskTrgC |= 1 << (i - 10);
-                else       maskTrgA |= 1 << i;
-            } else clearBit(i, 0x1E, false);
-		}
-        addWordToWrite(0x1A, maskTrgA);
-        addWordToWrite(0x3A, maskTrgC);
-        if (transceive() && _BitScanForward(&curPM, maskSPI)) emit linksStatusReady(maskSPI);
+        if (maskSPI == 0 || forced) { //PMs should be probed by SPI
+            for (quint8 iPM=0; iPM<20; ++iPM) {
+                if (!(maskSPI >> iPM & 1)) setBit(iPM, 0x1E, false);
+                addTransaction(read, 0x200*(iPM+1) + 0xFE, &voltage);
+                if (!transceive()) return;
+                if (voltage == 0xFFFFFFFF) { //SPI error
+                    clearBit(iPM, 0x1E, false);
+                } else {
+                    maskSPI |= 1 << iPM;
+                    if (iPM > 9) maskTrgC |= 1 << (iPM - 10);
+                    else         maskTrgA |= 1 << iPM;
+                }
+            }
+            addWordToWrite(0x1A, maskTrgA);
+            addWordToWrite(0x3A, maskTrgC);
+            if (!transceive()) return;
+        }
+        emit linksStatusReady(maskSPI);
     }
 
     void sync() { //read actual values
