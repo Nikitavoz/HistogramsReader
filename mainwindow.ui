@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>704</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1200</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>704</height>
    </size>
   </property>
   <property name="font">
@@ -50,2452 +44,1255 @@
    <locale language="English" country="World"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="1" rowspan="2">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>70</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Link status</string>
-      </property>
-      <widget class="QLabel" name="label_icon_clock">
-       <property name="geometry">
-        <rect>
-         <x>74</x>
-         <y>40</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="../!images/img.qrc">:/1G.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_trigger">
-       <property name="geometry">
-        <rect>
-         <x>3</x>
-         <y>22</y>
-         <width>70</width>
-         <height>13</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>trigger sync:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_icon_trigger">
-       <property name="geometry">
-        <rect>
-         <x>74</x>
-         <y>17</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="../!images/img.qrc">:/1G.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_clock">
-       <property name="geometry">
-        <rect>
-         <x>3</x>
-         <y>45</y>
-         <width>70</width>
-         <height>13</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>clock sync:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Control</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="Switch" name="switch_historgamming">
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="SwitchOnClick">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QSpinBox" name="spinBox">
-         <property name="prefix">
-          <string>0x</string>
-         </property>
-         <property name="maximum">
-          <number>3563</number>
-         </property>
-         <property name="value">
-          <number>3563</number>
-         </property>
-         <property name="displayIntegerBase">
-          <number>16</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QPushButton" name="button_read">
-         <property name="text">
-          <string>Read</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QPushButton" name="button_save">
-         <property name="text">
-          <string>Save to file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QLabel" name="label_historgamming">
-         <property name="text">
-          <string>Histogramming</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QCheckBox" name="doRepeat">
-         <property name="toolTip">
-          <string notr="true">read data each second</string>
-         </property>
-         <property name="text">
-          <string>autoread</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_filter">
-         <property name="text">
-          <string>BC filter</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="Switch" name="switch_filter">
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="SwitchOnClick">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QPushButton" name="button_reset">
-         <property name="text">
-          <string>Reset</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QSpinBox" name="spin_auto_reset">
-         <property name="minimum">
-          <number>100</number>
-         </property>
-         <property name="maximum">
-          <number>65536</number>
-         </property>
-         <property name="value">
-          <number>5000</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QCheckBox" name="doAutoReset">
-         <property name="text">
-          <string>reset after max =</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="2">
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>110</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Histograms view</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="3">
-        <widget class="QRadioButton" name="radio_0">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>ADC_id</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="2">
-        <widget class="QPushButton" name="button_read_file">
-         <property name="text">
-          <string>Read file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QPushButton" name="button_update">
-         <property name="text">
-          <string>Update screen</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QRadioButton" name="radio_1">
-         <property name="text">
-          <string>1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QRadioButton" name="radio_01">
-         <property name="text">
-          <string>0+1</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3" colspan="2">
-        <widget class="QPushButton" name="button_clear_screen">
-         <property name="text">
-          <string>Clear screen</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>to log scale</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3" colspan="2">
-        <widget class="QCheckBox" name="doFixRanges">
-         <property name="text">
-          <string>fix ranges</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QPushButton" name="button_hide_show_zero">
-         <property name="text">
-          <string>Hide zero bars</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="3" rowspan="7">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,1" columnstretch="0,1">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="1" rowspan="4">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="Triggers">
        <attribute name="title">
-        <string>Time</string>
+        <string>Triggers per BC</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,1,1" columnstretch="1,1,1,1">
-        <item row="1" column="1">
-         <widget class="QCustomPlot" name="ctime06" native="true">
-          <layout class="QGridLayout" name="gridLayout_13">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_6">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_6">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_6">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+       <layout class="QVBoxLayout" name="verticalLayoutTriggersPerBC">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QCustomPlot" name="plotTrigSelectable" native="true"/>
         </item>
-        <item row="1" column="3">
-         <widget class="QCustomPlot" name="ctime08" native="true">
-          <layout class="QGridLayout" name="gridLayout_15">
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_8">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_8">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_8">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_9">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+        <item>
+         <widget class="QCustomPlot" name="plotTrigOrA" native="true"/>
         </item>
-        <item row="0" column="3">
-         <widget class="QCustomPlot" name="ctime04" native="true">
-          <layout class="QGridLayout" name="gridLayout_16">
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_4">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_4">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_4">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QCustomPlot" name="ctime07" native="true">
-          <layout class="QGridLayout" name="gridLayout_14">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_7">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_7">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_7">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCustomPlot" name="ctime02" native="true">
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_2">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_2">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_2">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCustomPlot" name="ctime03" native="true">
-          <layout class="QGridLayout" name="gridLayout_17">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_3">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_3">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_3">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCustomPlot" name="ctime05" native="true">
-          <layout class="QGridLayout" name="gridLayout_12">
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_5">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_5">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_5">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCustomPlot" name="ctime09" native="true">
-          <layout class="QGridLayout" name="gridLayout_11">
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_9">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_9">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_9">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_10">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QCustomPlot" name="ctime10" native="true">
-          <layout class="QGridLayout" name="gridLayout_10">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_10">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_10">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_10">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_10">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_11">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QCustomPlot" name="ctime11" native="true">
-          <layout class="QGridLayout" name="gridLayout_9">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_11">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_11">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_11">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_11">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_12">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="QCustomPlot" name="ctime12" native="true">
-          <layout class="QGridLayout" name="gridLayout_8">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_12">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_12">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_12">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_12">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_13">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCustomPlot" name="ctime01" native="true">
-          <layout class="QGridLayout" name="gridLayout_6">
-           <item row="2" column="1" rowspan="2" colspan="2">
-            <widget class="QLabel" name="lbl_StdDev">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLabel" name="lbl_Mean">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>45</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1" colspan="2">
-            <widget class="QLabel" name="lbl_Nev">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+        <item>
+         <widget class="QCustomPlot" name="plotTrigOrC" native="true"/>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="Time">
+       <attribute name="title">
+        <string>Time</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayoutTime" rowstretch="1,1,1" columnstretch="1,1,1,1">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QCustomPlot" name="plotTimeCh01" native="true"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCustomPlot" name="plotTimeCh02" native="true"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QCustomPlot" name="plotTimeCh03" native="true"/>
+        </item>
+        <item row="0" column="3">
+         <widget class="QCustomPlot" name="plotTimeCh04" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCustomPlot" name="plotTimeCh05" native="true"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCustomPlot" name="plotTimeCh06" native="true"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCustomPlot" name="plotTimeCh07" native="true"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="QCustomPlot" name="plotTimeCh08" native="true"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCustomPlot" name="plotTimeCh09" native="true"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCustomPlot" name="plotTimeCh10" native="true"/>
+        </item>
+        <item row="2" column="2">
+         <widget class="QCustomPlot" name="plotTimeCh11" native="true"/>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCustomPlot" name="plotTimeCh12" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Charge">
        <attribute name="title">
         <string>Charge</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_5" rowstretch="1,1,1" columnstretch="1,1,1,1" rowminimumheight="0,0,0" columnminimumwidth="0,0,0,0">
-        <item row="1" column="0">
-         <widget class="QCustomPlot" name="ccharge05" native="true">
-          <layout class="QGridLayout" name="gridLayout_22">
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_17">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_17">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_17">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_17">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_17">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QCustomPlot" name="ccharge07" native="true">
-          <layout class="QGridLayout" name="gridLayout_24">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_19">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_19">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_19">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_19">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_19">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCustomPlot" name="ccharge06" native="true">
-          <layout class="QGridLayout" name="gridLayout_23">
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_18">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_18">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_18">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_18">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_18">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCustomPlot" name="ccharge08" native="true">
-          <layout class="QGridLayout" name="gridLayout_25">
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_20">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_20">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_20">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_20">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_20">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+       <layout class="QGridLayout" name="gridLayoutCharge" rowstretch="1,1,1" columnstretch="1,1,1,1">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QCustomPlot" name="plotChrgCh01" native="true"/>
         </item>
         <item row="0" column="1">
-         <widget class="QCustomPlot" name="ccharge02" native="true">
-          <layout class="QGridLayout" name="gridLayout_19">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_14">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_14">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_14">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_14">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_14">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh02" native="true"/>
         </item>
         <item row="0" column="2">
-         <widget class="QCustomPlot" name="ccharge03" native="true">
-          <layout class="QGridLayout" name="gridLayout_20">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_15">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_15">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_15">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_15">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_15">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCustomPlot" name="ccharge01" native="true">
-          <layout class="QGridLayout" name="gridLayout_18">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_13">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_13">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_13">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_13">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh03" native="true"/>
         </item>
         <item row="0" column="3">
-         <widget class="QCustomPlot" name="ccharge04" native="true">
-          <layout class="QGridLayout" name="gridLayout_21">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_16">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_16">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_16">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_16">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_16">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh04" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCustomPlot" name="plotChrgCh05" native="true"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCustomPlot" name="plotChrgCh06" native="true"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCustomPlot" name="plotChrgCh07" native="true"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="QCustomPlot" name="plotChrgCh08" native="true"/>
         </item>
         <item row="2" column="0">
-         <widget class="QCustomPlot" name="ccharge09" native="true">
-          <layout class="QGridLayout" name="gridLayout_26">
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_21">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_21">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_21">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_21">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_21">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh09" native="true"/>
         </item>
         <item row="2" column="1">
-         <widget class="QCustomPlot" name="ccharge10" native="true">
-          <layout class="QGridLayout" name="gridLayout_27">
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_22">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_22">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_22">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_22">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_22">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh10" native="true"/>
         </item>
         <item row="2" column="2">
-         <widget class="QCustomPlot" name="ccharge11" native="true">
-          <layout class="QGridLayout" name="gridLayout_28">
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_23">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_23">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_23">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_23">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_23">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh11" native="true"/>
         </item>
         <item row="2" column="3">
-         <widget class="QCustomPlot" name="ccharge12" native="true">
-          <layout class="QGridLayout" name="gridLayout_29">
-           <item row="0" column="1">
-            <widget class="QLabel" name="lbl_Nev_24">
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="lbl_Mean_24">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>Mean:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_24">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="lbl_StdDev_24">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="font">
-              <font>
-               <family>Consolas</family>
-               <pointsize>9</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-               <kerning>false</kerning>
-              </font>
-             </property>
-             <property name="text">
-              <string>RMS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer_24">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <widget class="QCustomPlot" name="plotChrgCh12" native="true"/>
         </item>
        </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QGroupBox" name="groupBoxView">
+      <property name="title">
+       <string>View settings</string>
+      </property>
+      <widget class="QGroupBox" name="groupBoxADC">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>240</y>
+         <width>96</width>
+         <height>47</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <widget class="QRadioButton" name="radioADCb">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>30</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Both (0+1)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioADC0">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>2</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">ADC0</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioADC1">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>16</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string notr="true">ADC1</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxYscale">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>90</y>
+         <width>96</width>
+         <height>47</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>y-axis scale</string>
+       </property>
+       <widget class="QRadioButton" name="radioLogScale">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>29</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>logarithmic</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioLinScale">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>15</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>linear</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxXaxis">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>11</y>
+         <width>96</width>
+         <height>81</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>x-axis</string>
+       </property>
+       <widget class="QRadioButton" name="radioThreshold">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>41</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>≥ threshold:</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioFullRange">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>27</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>full range</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioAdjustable">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>13</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>adjustable</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="spinBoxThreshold">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>55</y>
+          <width>94</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>4294967295.000000000000000</double>
+        </property>
+        <property name="stepType">
+         <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+        </property>
+        <property name="value">
+         <double>4294967295.000000000000000</double>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxChargeUnits">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>179</y>
+         <width>96</width>
+         <height>60</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Charge units</string>
+       </property>
+       <widget class="QRadioButton" name="radBut_mV">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>29</y>
+          <width>41</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>mV</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radButADC">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>15</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ADC (≈43fC)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radButMIP">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>43</y>
+          <width>41</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>MIP</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonTune">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>32</y>
+          <width>45</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Tune...</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxTimeUnits">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>135</y>
+         <width>96</width>
+         <height>45</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Time units</string>
+       </property>
+       <widget class="QRadioButton" name="radBut_ns">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>29</y>
+          <width>41</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ns</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radButTDC">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>15</y>
+          <width>86</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TDC (≈13ps)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBoxControl">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>326</height>
+       </size>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <widget class="Switch" name="switchHistorgammingPM">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>262</y>
+         <width>30</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="SwitchOnClick">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelHistorgammingPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>247</y>
+         <width>88</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Histogramming:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelFilterPM">
+       <property name="geometry">
+        <rect>
+         <x>1</x>
+         <y>290</y>
+         <width>43</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>BC filter</string>
+       </property>
+      </widget>
+      <widget class="Switch" name="switchFilterPM">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>306</y>
+         <width>31</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="SwitchOnClick">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="buttonReset">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>150</y>
+         <width>94</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>RESET</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spinBoxBCfilterPM">
+       <property name="geometry">
+        <rect>
+         <x>45</x>
+         <y>287</y>
+         <width>54</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="prefix">
+        <string>0x</string>
+       </property>
+       <property name="maximum">
+        <number>3563</number>
+       </property>
+       <property name="value">
+        <number>3563</number>
+       </property>
+       <property name="displayIntegerBase">
+        <number>16</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelBoard">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>4</y>
+         <width>35</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Board:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBoxBoard">
+       <property name="geometry">
+        <rect>
+         <x>38</x>
+         <y>3</y>
+         <width>60</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="currentIndex">
+        <number>5</number>
+       </property>
+       <property name="maxCount">
+        <number>22</number>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>TCM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">PMA0</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">PMC0</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">PMC1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">PMC2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>rescan</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="labelHistorgammingOffPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>262</y>
+         <width>15</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>off</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelHistorgammingOnPM">
+       <property name="geometry">
+        <rect>
+         <x>47</x>
+         <y>262</y>
+         <width>15</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>on</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelFilterOnPM">
+       <property name="geometry">
+        <rect>
+         <x>47</x>
+         <y>306</y>
+         <width>15</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>on</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelFilterOffPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>306</y>
+         <width>15</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>off</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelIconClockSyncPM">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>227</y>
+         <width>16</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../!images/img.qrc">:/1G.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelIconTriggerSyncPM">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>209</y>
+         <width>16</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../!images/img.qrc">:/1G.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelTriggerSyncPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>211</y>
+         <width>67</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>trigger sync</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelClockSyncPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>228</y>
+         <width>67</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>clock sync</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxMax">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>78</y>
+         <width>96</width>
+         <height>72</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Max bin count</string>
+       </property>
+       <widget class="QLabel" name="labelValueMax">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>12</y>
+          <width>70</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>4294967295</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="spinBoxMax">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>46</y>
+          <width>94</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>4294967295.000000000000000</double>
+        </property>
+        <property name="stepType">
+         <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+        </property>
+        <property name="value">
+         <double>4294967295.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="doAutoReset">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>29</y>
+          <width>90</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>autoreset on:</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QComboBox" name="comboBoxSelectableHistogramTCM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>189</y>
+         <width>96</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <property name="maxVisibleItems">
+        <number>16</number>
+       </property>
+       <property name="maxCount">
+        <number>16</number>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string notr="true">disabled</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>OrA</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>OrC/OuterRings</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>SemiCentral/Nchannels</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Central/Charge</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Vertex/InnerRings</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>NoiseA</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>NoiseC</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Total noise</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>True OrA</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>True OrC</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Interaction</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>True Interaction</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>True Vertex</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Beam-gas A</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Beam-gas C</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="labelFirstHistorgramTCM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>175</y>
+         <width>96</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>First histogram:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxDataRead">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>20</y>
+         <width>96</width>
+         <height>59</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Data read</string>
+       </property>
+       <widget class="QPushButton" name="buttonRead">
+        <property name="geometry">
+         <rect>
+          <x>49</x>
+          <y>37</y>
+          <width>45</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Read</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="autoRead">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>38</y>
+          <width>45</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string notr="true">read data each second</string>
+        </property>
+        <property name="text">
+         <string>auto</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelms">
+        <property name="geometry">
+         <rect>
+          <x>56</x>
+          <y>12</y>
+          <width>40</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ms</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelMbitps">
+        <property name="geometry">
+         <rect>
+          <x>56</x>
+          <y>25</y>
+          <width>40</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Mbit/s</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelValueTime">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>12</y>
+          <width>37</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>101.1</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelValueSpeed">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>25</y>
+          <width>37</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>393.2</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelAt">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>25</y>
+          <width>12</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>at</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labelIn">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>12</y>
+          <width>12</width>
+          <height>12</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>in</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBoxFile">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Data file</string>
+      </property>
+      <widget class="QPushButton" name="buttonLoad">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>12</y>
+         <width>46</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load...</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="buttonSave">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>12</y>
+         <width>46</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save...</string>
+       </property>
       </widget>
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="QLabel" name="label_PM">
-      <property name="font">
-       <font>
-        <family>Calibri</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
+     <widget class="QGroupBox" name="groupBoxTarget">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>55</height>
+       </size>
       </property>
-      <property name="text">
-       <string>PM:</string>
+      <property name="title">
+       <string>Target</string>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QComboBox" name="comboBox">
-      <item>
-       <property name="text">
-        <string notr="true">A0</string>
+      <widget class="QPushButton" name="buttonChangeIPaddress">
+       <property name="geometry">
+        <rect>
+         <x>46</x>
+         <y>-1</y>
+         <width>50</width>
+         <height>21</height>
+        </rect>
        </property>
-      </item>
-      <item>
        <property name="text">
-        <string notr="true">C0</string>
+        <string>Change</string>
        </property>
-      </item>
-      <item>
+      </widget>
+      <widget class="QLabel" name="labelValueIPaddress">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>19</y>
+         <width>94</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string notr="true">C1</string>
+        <string>172.020.075.180</string>
        </property>
-      </item>
-      <item>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelStatus">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>36</y>
+         <width>96</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 44, 38, 63);</string>
+       </property>
        <property name="text">
-        <string notr="true">C2</string>
+        <string>99.7% data lost!</string>
        </property>
-      </item>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1200</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="sizeGripEnabled">
-    <bool>false</bool>
-   </property>
   </widget>
  </widget>
  <customwidgets>
@@ -2507,7 +1304,7 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
+   <header location="global">qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

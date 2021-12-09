@@ -7,8 +7,8 @@
 const quint16 maxPacket = 368, //368 words, limit from Ethernet MTU of 1500 bytes
               maxPayload = maxPacket - 3; //1 word for packet header and 2 words for transaction headers (maximum 255 words in one transaction)
 
-enum errorType {networkError = 0, IPbusError = 1, logicError = 2};
-static const char *errorTypeName[3] = {"Network error" , "IPbus error", "Logic error"};
+enum errorType                        {networkError = 0, IPbusError = 1, logicError = 2, noResponse = 3};
+static const char *errorTypeName[4] = {"Network error" , "IPbus error" , "Logic error" , "No response" };
 
 class IPbusTarget: public QObject {
     Q_OBJECT
@@ -43,9 +43,10 @@ public:
     }
 
     quint32 readRegister(quint32 address) {
-        quint32 data = 0xFFFFFFFF;
-        addTransaction(read, address, &data, 1);
-        return transceive(true) ? data : 0xFFFFFFFF;
+        if (!transactionsList.isEmpty()) transceive();
+        addTransaction(read, address, nullptr, 1);
+        TransactionHeader *th = transactionsList.last().responseHeader;
+        return transceive(false) && th->InfoCode == 0 ? quint32(*++th) : 0xFFFFFFFF;
     }
 
     void log(QString st) { qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ") + st; }
@@ -65,11 +66,10 @@ protected:
     }
 
     void debugPrint() {
-        printf("request:\n");
-        for (quint16 i=0; i<requestSize; ++i)  printf("%08X\n", request[i]);
-        printf("        response:\n");
-        for (quint16 i=0; i<responseSize; ++i) printf("        %08X\n", response[i]);
-        printf("\n");
+        qDebug("request:");
+        for (quint16 i=0; i<requestSize; ++i)  qDebug("%08X", request[i]);
+        qDebug("        response:");
+        for (quint16 i=0; i<responseSize; ++i) qDebug("        %08X", response[i]);
     }
 
     void addTransaction(TransactionType type, quint32 address, quint32 *data, quint8 nWords = 1) {
@@ -131,7 +131,6 @@ protected:
         }
         n = qsocket->readDatagram((char *)response, qsocket->pendingDatagramSize());
         if (n == 64 && response[0] == statusRequest.header) {
-            log("unexpected status packet received");
             if (!qsocket->hasPendingDatagrams() && !qsocket->waitForReadyRead(100) && !qsocket->hasPendingDatagrams()) {
                 isOnline = false;
                 emit noResponse();
@@ -153,54 +152,6 @@ protected:
         }
     }
 
-    quint32 readFast(quint32 address, quint32 *data, quint32 dataSize, quint8 qdmax = 5) {
-        const quint32 *e = data + dataSize; //end of data pointer
-        quint32
-            *rp = data, //pointer to next quint32 of data to request
-            *p = data, //pointer to next quint32 of data to save
-            *cp, //pointer to next quint32 of response to copy data from
-            offset = dataSize % maxPayload; //payload size for the first packet
-        quint8 qd = 0, i;
-        request[0] = quint32(PacketHeader(control, 0));
-        request[2] = address;
-        request[4] = address;
-        if (offset) {
-            bool lo = offset > 255; //long offset, needs 2 transactions
-            request[1]         = TransactionHeader(nonIncrementingRead, lo ? 183 : offset, 0);
-            if (lo) request[3] = TransactionHeader(nonIncrementingRead,      offset - 183, 1);
-            requestSize = lo ? 5 : 3;
-            responseSize = offset + (lo ? 3 : 2);
-            qsocket->write((char *)request, requestSize * wordSize);
-            rp += offset;
-            if (!qsocket->waitForReadyRead(100)) return 0;
-            qsocket->read((char *)response, responseSize * wordSize);
-            for         (i=0, cp=response+  2; i < (lo ? 183 : offset); ++i, ++cp) *(p++) = *cp;
-            if (lo) for (i=0, cp=response+186; i <      (offset - 183); ++i, ++cp) *(p++) = *cp;
-        }
-        if (dataSize > offset) {
-            request[1] = TransactionHeader(nonIncrementingRead, 183, 0);
-            request[3] = TransactionHeader(nonIncrementingRead, 182, 1);
-            requestSize = 5;
-            responseSize = maxPacket;
-            while (p != e) {
-                if (qsocket->bytesAvailable() >= responseSize * wordSize) {
-                    qsocket->read((char *)response, responseSize * wordSize);
-                    for (i=0, cp=response+  2; i<183; ++i, ++cp) *(p++) = *cp;
-                    for (i=0, cp=response+186; i<182; ++i, ++cp) *(p++) = *cp;
-                    --qd;
-                } else if (qd < qdmax && rp != e) {
-                    qsocket->write((char *)request, requestSize * wordSize);
-                    ++qd;
-                    rp += maxPayload;
-                } else {
-                    if (!qsocket->waitForReadyRead(100)) break;
-                }
-            }
-        }
-        resetTransactions();
-        return p - data;
-    }
-
     bool processResponse() { //check transactions successfulness and copy read data to destination
         for (quint16 i=0; i<transactionsList.size(); ++i) {
             TransactionHeader *th = transactionsList.at(i).responseHeader;
@@ -211,19 +162,20 @@ protected:
             if (th->Words > 0) switch (th->TypeID) {
                 case                read:
                 case nonIncrementingRead:
-                case   configurationRead:
-                    if (transactionsList.at(i).data != nullptr) {
-                        quint32 *src = (quint32 *)th + 1, *dst = transactionsList.at(i).data;
-                        while (src <= (quint32 *)th + th->Words && src < response + responseSize) *dst++ = *src++;
-                    }
-                    if ((quint32 *)th + th->Words >= response + responseSize) { //response too short to contain nWords values
-                        emit successfulRead(response + responseSize - (quint32 *)th - 1);
-                        debugPrint();
-                        emit error("read transaction truncated", IPbusError);
+                case   configurationRead: {
+                    quint32 wordsAhead = response + responseSize - (quint32 *)th - 1;
+                    if (th->Words > wordsAhead) { //response too short to contain nWords values
+                        if (transactionsList.at(i).data != nullptr) memcpy(transactionsList.at(i).data, (quint32 *)th + 1, wordsAhead * wordSize);
+                        emit successfulRead(wordsAhead);
+                        if (th->InfoCode == 0)
+                            emit error(QString::asprintf("read transaction from %08X truncated: %d/%d words received", *transactionsList.at(i).address, wordsAhead, th->Words), IPbusError);
                         return false;
-                    } else
+                    } else {
+                        if (transactionsList.at(i).data != nullptr) memcpy(transactionsList.at(i).data, (quint32 *)th + 1, th->Words * wordSize);
                         emit successfulRead(th->Words);
+                    }
                     break;
+                }
                 case RMWbits:
                 case RMWsum :
                     if (th->Words != 1) {
@@ -243,11 +195,63 @@ protected:
             }
             if (th->InfoCode != 0) {
                 debugPrint();
-                emit error(th->infoCodeString() + QString::asprintf(", address: %08X", *transactionsList.at(i).address + (th->Words ? th->Words - 1 : 0)), IPbusError);
+                emit error(th->infoCodeString() + QString::asprintf(", address: %08X", *transactionsList.at(i).address + th->Words + (th->InfoCode == 4 ? -1 : 0)), IPbusError);
                 return false;
             }
         }
         return true;
+    }
+
+    size_t readFast(quint32 address, quint32 *data, size_t dataSize, bool nonIncrementing = true, quint8 qdmax = 5) {
+        const quint32 *e = data + dataSize; //pointer to end of data
+        quint32
+            *rp = data, //pointer to next quint32 of data to request
+            *p = data, //pointer to next quint32 of data to save
+            offset = dataSize % maxPayload; //payload size for the first packet
+        quint8 qd = 0, t0p, t1p; //queue depth, transaction0 payload, transaction1 payload
+        TransactionType tt = nonIncrementing ? nonIncrementingRead : read;
+        bool inc = !nonIncrementing;
+        request[0] = quint32(PacketHeader(control, 0));
+        if (offset) {
+            bool lo = offset > 255; //long offset, requires 2 transactions
+            t0p = lo ? maxPayload/2 : offset; t1p = offset - t0p;
+            request[1] = TransactionHeader(tt, t0p, 0);
+            request[2] = address; if (inc) request[2] += rp - data; rp += t0p;
+            if (lo) {
+                request[3] = TransactionHeader(tt, t1p, 1);
+                request[4] = address; if (inc) request[4] += rp - data; rp += t1p;
+            }
+            requestSize = lo ? 5 : 3;
+            responseSize = offset + (lo ? 3 : 2);
+            qsocket->write((char *)request, requestSize * wordSize);
+            if (!qsocket->waitForReadyRead(100) && !qsocket->hasPendingDatagrams()) return 0;
+            qsocket->read((char *)response, responseSize * wordSize);
+                      memcpy(p, response + 2      , t0p * wordSize); p += t0p;
+            if (lo) { memcpy(p, response + 3 + t0p, t1p * wordSize); p += t1p; }
+        }
+        if (dataSize > offset) {
+            t0p = maxPayload/2, t1p = maxPayload - t0p;
+            request[1] = TransactionHeader(tt, t0p, 0);
+            request[3] = TransactionHeader(tt, t1p, 1);
+            requestSize = 5;
+            responseSize = maxPacket;
+            while (p != e) {
+                if (qsocket->bytesAvailable() >= responseSize * wordSize) { //have response, read
+                    qsocket->read((char *)response, responseSize * wordSize);
+                    memcpy(p, response + 2      , t0p * wordSize); p += t0p;
+                    memcpy(p, response + 3 + t0p, t1p * wordSize); p += t1p;
+                    --qd;
+                } else if (qd < qdmax && rp != e) { //send next request
+                    request[2] = address; if (inc) request[2] += rp - data; rp += t0p;
+                    request[4] = address; if (inc) request[4] += rp - data; rp += t1p;
+                    qsocket->write((char *)request, requestSize * wordSize);
+                    ++qd;
+                } else if (!qsocket->waitForReadyRead(100) && !qsocket->hasPendingDatagrams())
+                    break;
+            }
+        }
+        resetTransactions();
+        return p-data;
     }
 
 protected slots:
@@ -291,7 +295,7 @@ public slots:
 
     virtual void sync() =0;
 
-    void writeRegister(quint32 data, quint32 address, bool syncOnSuccess = true) {
+    void writeRegister(quint32 address, quint32 data, bool syncOnSuccess = true) {
         addTransaction(write, address, &data, 1);
         if (transceive() && syncOnSuccess) sync();
     }
@@ -306,7 +310,7 @@ public slots:
         if (transceive() && syncOnSuccess) sync();
     }
 
-    void writeNbits(quint32 data, quint32 address, quint8 nbits = 16, quint8 shift = 0, bool syncOnSuccess = true) {
+    void writeNbits(quint32 address, quint32 data, quint8 nbits = 16, quint8 shift = 0, bool syncOnSuccess = true) {
         quint32 mask = (1 << nbits) - 1; //e.g. 0x00000FFF for nbits==12
         addTransaction(RMWbits, address, masks( ~quint32(mask << shift), quint32((data & mask) << shift) ));
         if (transceive() && syncOnSuccess) sync();
