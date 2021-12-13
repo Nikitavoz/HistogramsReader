@@ -168,6 +168,7 @@ public:
 //signal-slot conections
         connect(&FEE, &IPbusTarget::IPbusStatusOK, this, [=]() {
            ui->labelStatus->setStyleSheet(OKstyle);
+           ui->labelStatus->setText("online");
            FV0 = (FEE.readRegister(0x7) & 0b11) == 2;
            QComboBox *b = ui->comboBoxSelectableHistogramTCM;
            b->setItemData(0x0, "disabled"                    , Qt::DisplayRole); b->setItemData(0x0, ""                                   , Qt::ToolTipRole);

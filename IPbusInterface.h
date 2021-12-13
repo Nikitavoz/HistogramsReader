@@ -7,8 +7,8 @@
 const quint16 maxPacket = 368, //368 words, limit from Ethernet MTU of 1500 bytes
               maxPayload = maxPacket - 3; //1 word for packet header and 2 words for transaction headers (maximum 255 words in one transaction)
 
-enum errorType                        {networkError = 0, IPbusError = 1, logicError = 2, noResponse = 3};
-static const char *errorTypeName[4] = {"Network error" , "IPbus error" , "Logic error" , "No response" };
+enum errorType                        {networkError = 0, IPbusError = 1, logicError = 2};
+static const char *errorTypeName[4] = {"Network error" , "IPbus error" , "Logic error" };
 
 class IPbusTarget: public QObject {
     Q_OBJECT
