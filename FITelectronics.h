@@ -246,26 +246,26 @@ public slots:
     void selectTriggerHistogram(quint8 n) { writeNbits(0x0E, n, 4, 4, false); if (n && TCMmode.selectableHist != n) reset(); }
 
     bool readTimeAlignment(quint32* data) {
-        addTransaction(read, (curPM+1)*0x200 + 1, data, 12);
+        addTransaction(read, iBd*0x200 + 1, data, 12);
         return transceive();
     }
     bool writeTimeAlignment(quint32* data) {
-        addTransaction(write, (curPM+1)*0x200 + 1, data, 12);
+        addTransaction(write, iBd*0x200 + 1, data, 12);
         return transceive();
     }
 
     bool readADCRegisters(quint32 *data) {
-        addTransaction(read, (curPM+1)*0x200+0x7F+1,data, 12*4);
+        addTransaction(read, iBd*0x200+0x7F+1,data, 12*4);
         return transceive();
     }
 
     bool writeADCRegisters(quint32 *data) {
-        addTransaction(write, (curPM+1)*0x200+0x7F+1,data, 12*4);
+        addTransaction(write, iBd*0x200+0x7F+1,data, 12*4);
         return transceive();
     }
 
     bool readCounters(quint32 *data) {
-        addTransaction(read, (curPM+1)*0x200+0xC0, data, 24);
+        addTransaction(read, iBd*0x200+0xC0, data, 24);
         return transceive();
     }
 

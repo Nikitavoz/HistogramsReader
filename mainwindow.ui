@@ -212,6 +212,24 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="calibLog">
+       <attribute name="title">
+        <string>Calibration Logs</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="calTextOutput">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>10</y>
+          <width>911</width>
+          <height>651</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
     <item row="3" column="0">
@@ -555,7 +573,7 @@
       <property name="title">
        <string/>
       </property>
-      <widget class="Switch" name="switchHistorgammingPM">
+      <widget class="Switch" name="switchHistorgammingPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -564,10 +582,10 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="text">
+       <property name="text" stdset="0">
         <string/>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -597,7 +615,7 @@
         <string>BC filter</string>
        </property>
       </widget>
-      <widget class="Switch" name="switchFilterPM">
+      <widget class="Switch" name="switchFilterPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -606,7 +624,7 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -1172,6 +1190,47 @@
         </property>
        </widget>
       </widget>
+      <widget class="QComboBox" name="comboBoxCalibrationPM">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>191</y>
+         <width>91</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>Time Alignment</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ADC_DELAY</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>CFD_ZERO</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="labelCalibrationPM">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>175</y>
+         <width>96</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Calibration</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
      </widget>
     </item>
     <item row="2" column="0">
@@ -1216,27 +1275,6 @@
        <property name="text">
         <string>Save...</string>
        </property>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;XX&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <attribute name="title">
-        <string>Calibration Log</string>
-       </attribute>
-       <widget class="QPlainTextEdit" name="calTextOutput">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>941</width>
-          <height>481</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
       </widget>
      </widget>
     </item>
