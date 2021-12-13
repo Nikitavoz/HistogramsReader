@@ -4,9 +4,14 @@
 #include <QtWidgets>
 #include <QMainWindow>
 #include <QElapsedTimer>
+#include <array>
+
 #include "ui_mainwindow.h"
 #include "switch.h"
 #include "FITelectronics.h"
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+
 #include "qcustomplot.h"
 
 static inline double roundDownOrder(double v) { return pow(10, floor( log10(fabs(v)) )); } //round down one decimal order of magnitude
@@ -165,6 +170,11 @@ public:
                 updatePlot(h);
             });
         }
+        QFont font("monospace");
+        font.setStyleHint(QFont::TypeWriter);
+        font.setFamily("courier");
+        ui->calTextOutput->setFont(font);
+
 //signal-slot conections
         connect(&FEE, &IPbusTarget::IPbusStatusOK, this, [=]() {
            ui->labelStatus->setStyleSheet(OKstyle);
@@ -300,6 +310,311 @@ public:
         ui->autoRead        ->setVisible(!wrongBoard);
         foreach(QWidget *w,  PMwidgets) w->setVisible(FEE.iBd != 0);
         foreach(QWidget *w, TCMwidgets) w->setVisible(FEE.iBd == 0);
+    }
+
+    bool setAttenuator(float db) {
+        QPlainTextEdit *p = ui->calTextOutput;
+        //p->clear();
+        QSerialPort s(this);
+        s.setPortName("COM3");
+        s.setBaudRate(QSerialPort::Baud9600);
+        s.setDataBits(QSerialPort::Data8);
+        s.setParity(QSerialPort::NoParity);
+        s.setStopBits(QSerialPort::OneStop);
+        s.setFlowControl(QSerialPort::NoFlowControl);
+        if (!s.open(QIODevice::ReadWrite)) {
+            auto errMsg = s.errorString();
+            p->insertPlainText(errMsg);
+            return false;
+        }
+        p->insertPlainText(s.readAll());
+        QByteArray const data = tr("A%1\r").arg(db,5,'f',2,QLatin1Char('0')).toLocal8Bit();
+        s.write(data);
+        while (s.waitForBytesWritten(100)) {
+           ;
+        }
+        while (s.waitForReadyRead(100)) {
+            p->insertPlainText(s.readAll());
+        }
+        if (s.isOpen()) {
+            s.close();
+        }
+        return true;
+    }
+
+    // calibration
+    std::string formatPM() const {
+        QString str;
+        return QString::asprintf("%c%d",
+                           FEE.iBd>=11 ? 'C' : 'A',
+                           FEE.iBd - 10*(FEE.iBd>=11) - 1).toStdString();
+    }
+    void computeMeanTime(double *meanTime, double *stdTime, int *timeOK) {
+        for (auto ch=0; ch<12; ++ch) {
+            timeOK[ch] = false;
+            meanTime[ch] = 0.0;
+            double sumW=0;
+            for (auto i=0; i<4096; ++i) {
+                sumW += FEE.DCh[ch].binValueTime(i);
+            }
+            double sumWX = 0;
+            double sumWXX = 0;
+            for (auto i=0; i<4096; ++i) {
+                double const weight = double(FEE.DCh[ch].binValueTime(i))/sumW;
+                auto const signedTime = (i>=2048 ? i-4096 : i);
+                sumWX  += weight * signedTime;
+                sumWXX += weight * signedTime * signedTime;
+            }
+            timeOK[ch] = false;
+            if (sumW > 100) {
+                meanTime[ch] = sumWX;
+                stdTime[ch] = std::sqrt(sumWXX - sumWX*sumWX);
+                timeOK[ch] = stdTime[ch] < 80;
+            } else {
+                meanTime[ch] = 0;
+                stdTime[ch] = 0;
+                timeOK[ch] = -1;
+            }
+        }
+    }
+    void on_buttonCalTimeOffset_clicked() {
+        ui->tabWidget->setCurrentIndex(3);
+        QPlainTextEdit *p = ui->calTextOutput;
+        p->clear();
+
+        p->insertPlainText("FEE RESET\n");
+        FEE.reset();
+        Sleep(10);
+        FEE.switchHistogramming(true);
+        Sleep(500);
+        auto n = FEE.readHistograms(hTime);
+        p->insertPlainText(QString::asprintf("Read Histograms(%d)\n\n",n.read));
+
+        p->insertPlainText("TIME OFFSET CALIBRATION\n\n");
+        p->insertPlainText(" PM  CH  meanTime stdTime\n");
+
+        double meanTime[12];
+        double stdTime[12];
+        int timeOK[12];
+        computeMeanTime(meanTime,stdTime,timeOK);
+        for (auto ch=0; ch<12; ++ch) {
+            p->insertPlainText(QString::asprintf(" %s  CH%02d %7.2f %7.2f %s\n",
+                                           formatPM().c_str(),
+                                           ch, meanTime[ch], stdTime[ch],
+                                           timeOK[ch] == 1 ? "OK" : (timeOK[ch] == 0 ? "BAD" : "EMPTY")));
+        }
+
+        p->insertPlainText("\nRegister Update\n\n");
+        p->insertPlainText(" PM  CH   OLD -> NEW  STATUS\n");
+        // update registers
+        quint32 regs[12];
+        auto success = FEE.readTimeAlignment(regs);
+        for (int ch=0; ch<12; ++ch) {
+            if (timeOK[ch]) {
+                quint32 regNew = int(regs[ch]&4095) + std::lround(meanTime[ch]);
+                p->insertPlainText(QString::asprintf(" %s  CH%02d %4d->%4d  %s\n",
+                                               formatPM().c_str(),
+                                               ch,
+                                               (regs[ch]&4095), regNew,
+                                               (regs[ch]&4095) == regNew ? "NO CHANGE": "UPDATED"));
+                regs[ch] = ((regs[ch] >> 12) << 12) | (regNew & 4095);
+            } else {
+                p->insertPlainText(QString::asprintf(" %s  CH%02d %4d        NO TIME MEASUREMENT\n",
+                                               formatPM().c_str(),
+                                               ch,
+                                               (regs[ch]&4095)));
+            }
+        }
+        success = FEE.writeTimeAlignment(regs);
+        p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+        QScrollBar *sb = p->verticalScrollBar();
+        sb->setValue(sb->maximum());
+    }
+    void on_buttonCalADCDelay_clicked() {
+        ui->tabWidget->setCurrentIndex(3);
+        QPlainTextEdit *p = ui->calTextOutput;
+        p->clear();
+
+        quint32 adcRegs[4*12];
+        bool  success = FEE.readADCRegisters(adcRegs);
+        quint32 adcRegsOld[4*12];
+        std::copy(adcRegs, adcRegs+4*12, adcRegsOld);
+        quint32 counters[24];
+        quint32 countersOld[24];
+        int const m = 20000/200;
+        quint32 rates[12][m];
+        for (int ch=0; ch<12; ++ch) {
+            for (int i=0; i<m; ++i) {
+                rates[ch][i] = 0;
+            }
+        }
+        p->insertPlainText("ADC DELAY CALIBRATION\n\n");
+        p->insertPlainText(" Delay | ");
+        for (int ch=0; ch<12; ++ch) {
+            p->insertPlainText(QString::asprintf(" CH%02d", ch));
+        }
+        p->insertPlainText("\n");
+        bool atLeastOneNonZeroRate = false;
+        for (int i=0; i<m; ++i) {
+            int const ADCRegisters = 200*i;
+            for (int j=0; j<12; ++j) {
+                adcRegs[4*j+3] = ADCRegisters;
+            }
+            FEE.writeADCRegisters(adcRegs);
+            Sleep(10);
+            success = FEE.readCounters(countersOld);
+            Sleep(100);
+            success = FEE.readCounters(counters);
+            bool nonZeroRates[12] = {false};
+            for (int ch=0; ch<12; ++ch  ) {
+                rates[ch][i] = counters[2*ch+1]-countersOld[2*ch+1];
+                atLeastOneNonZeroRate = (rates[ch][i]>0 ? true : atLeastOneNonZeroRate);
+                nonZeroRates[ch] = rates[ch][i]>0;
+            }
+            p->insertPlainText(QString::asprintf("%6d | ", ADCRegisters));
+            for (int ch=0; ch<12; ++ch) {
+                p->insertPlainText(QString::asprintf("%5d", rates[ch][i]));
+            }
+            p->insertPlainText("\n");
+            QScrollBar *sb = p->verticalScrollBar();
+            sb->setValue(sb->maximum());
+            qApp->processEvents();
+        }
+
+        p->insertPlainText("\n\nREGISTER UPDATE\n\n");
+        p->insertPlainText(" PM  CH    old -> new   STATUS\n");
+
+        for (int ch=0; ch<12; ++ch) {
+            double sumW  = 0.0;
+            double sumWX = 0.0;
+            for (int i=0; i<m; ++i) {
+                sumW  += rates[ch][i] ;
+                sumWX += (i*200) * rates[ch][i];
+            }
+            if (sumW != 0.0) {
+                quint32 const off = std::lround(sumWX/sumW);
+                p->insertPlainText(QString::asprintf(" %s  CH%02d %5d->%5d  %s\n",
+                                               formatPM().c_str(),
+                                               ch,
+                                               adcRegsOld[4*ch+3], off,
+                                               adcRegsOld[4*ch+3]== off ? "NO CHANGE" : "UPDATE"));
+                adcRegs[4*ch+3] = off;
+            } else {
+                p->insertPlainText(QString::asprintf(" %s  CH%02d %5d         NO DATA\n",
+                                               formatPM().c_str(),
+                                               ch,
+                                               adcRegsOld[4*ch+3]));
+                // restore old settings
+                adcRegs[4*ch+3] = adcRegsOld[4*ch+3];
+            }
+        }
+        success = FEE.writeADCRegisters(adcRegs);
+        p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+        QScrollBar *sb = p->verticalScrollBar();
+        sb->setValue(sb->maximum());
+    }
+
+    void on_buttonCalCFDThreshold_clicked() {
+        ui->tabWidget->setCurrentIndex(3);
+        QPlainTextEdit *p = ui->calTextOutput;
+        p->clear();
+
+        quint32 adcRegs[4*12];
+        bool  success = FEE.readADCRegisters(adcRegs);
+        quint32 adcRegsOld[4*12];
+        std::copy(adcRegs, adcRegs+4*12, adcRegsOld);
+
+        double meanTime[12];
+        double stdTime[12];
+        int timeOK[12];
+        quint32 counters[24];
+        quint32 countersOld[24];
+
+        std::array<float,3> attenuation = {15,20,25};
+        std::array<int,21> cfdZERO; // -500:50:500
+        for (int i=0; i<cfdZERO.size(); ++i) {
+            cfdZERO[i] = std::round(500 * double(i-int(cfdZERO.size()/2)) / double(cfdZERO.size()-1) * 2);
+        }
+
+        struct MeasurementValue {
+             double tMean = 0.0;
+             double tRMS  = 0.0;
+             int    tOK   = false;
+             double rate  = 0.0;
+             double cMean = 0.0;
+             double cRMS  = 0.0;
+             std::string format() const {
+                 return QString::asprintf("%6.1f±%-3.0f %4.0f", tMean, tRMS, rate).toStdString();
+             }
+             bool operator<(const MeasurementValue& v) const {
+                 return tMean < v.tMean;
+             }
+        };
+
+        std::array<std::array<std::array<MeasurementValue, attenuation.size()>, cfdZERO.size()>, 12> times;
+        for (int i=0; i<attenuation.size(); ++i) {
+            setAttenuator(attenuation[i]);
+            //p->insertPlainText(QString::asprintf("%4.0fdb: ", attenuation[i]));
+            Sleep(100);
+            for (int j=0; j<cfdZERO.size(); ++j) {
+                for (int ch=0; ch<12; ++ch) {
+                    adcRegs[4*ch+1] = cfdZERO[j];
+                }
+                p->insertPlainText(QString::asprintf("%5d", cfdZERO[j]));
+                FEE.reset();
+                Sleep(10);
+                success = FEE.writeADCRegisters(adcRegs);
+                Sleep(10);
+
+                FEE.switchHistogramming(true);
+                success = FEE.readCounters(countersOld);
+                Sleep(200);
+                success = FEE.readCounters(counters);
+                /*quint32 n = */FEE.readHistograms(hTime);
+                computeMeanTime(meanTime,stdTime,timeOK);
+                for (int ch=0; ch<12; ++ch) {
+                    times[ch][j][i] = {meanTime[ch], stdTime[ch], timeOK[ch],
+                                       double(counters[ch]-countersOld[ch])/0.2,
+                                       0.0, 0.0};
+#if 0
+                    p->insertPlainText(QString::asprintf(" %s  CH%02d %7.2f %7.2f %s  %s\n",
+                                                   formatPM().c_str(),
+                                                   ch, meanTime[ch], stdTime[ch],
+                                                   timeOK[ch] == 1 ? "OK   " : (timeOK[ch] == 0 ? "BAD  " : "EMPTY"),  times[ch][j][i].format().c_str()));
+#endif
+
+
+                }
+                QScrollBar *sb = p->verticalScrollBar();
+                sb->setValue(sb->maximum());
+                qApp->processEvents();
+            }
+            p->insertPlainText("\n");
+        }
+        p->insertPlainText("\n\n");
+        setAttenuator(20.0);
+        for (int ch=0; ch<12; ++ch) {
+            p->insertPlainText(" PM  CH  CFD_ZERO");
+            for (int j=0; j<attenuation.size(); ++j) {
+                p->insertPlainText(QString::asprintf("%6.0fdB       ", attenuation[j]));
+            }
+            p->insertPlainText(" | Time Variation\n");
+            for (int i=0; i<cfdZERO.size(); ++i) {
+                p->insertPlainText(QString::asprintf(" %s  CH%02d %6d ",
+                                               formatPM().c_str(),
+                                               ch, cfdZERO[i]));
+                for (int j=0; j<attenuation.size(); ++j) {
+                    p->insertPlainText(QString::asprintf("%s", times[ch][i][j].format().c_str()));
+                }
+                auto const tMinMax = std::minmax_element(times[ch][i].begin(), times[ch][i].end());
+                p->insertPlainText(QString::asprintf(" | %7.2f\n", tMinMax.second->tMean - tMinMax.first->tMean));
+            }
+            p->insertPlainText("\n\n");
+        }
+        success = FEE.writeADCRegisters(adcRegsOld);
+        p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+        QScrollBar *sb = p->verticalScrollBar();
+        sb->setValue(sb->maximum());
     }
 
 public slots:
@@ -450,6 +765,9 @@ public slots:
         }
     };
     void on_tabWidget_currentChanged(int index) {
+        if (index == 3) { // Calibration logs
+            return; // NOP for now
+        }
         curType = TypeOfHistogram(index); //warning: tab indexes should correspond to histogram types for this to work
         ui->groupBoxADC        ->setVisible(index == hAmpl);
         ui->groupBoxChargeUnits->setVisible(index == hAmpl);
@@ -487,6 +805,24 @@ public slots:
         if (ui->radBut_mV->isChecked()) { mVperMIP   = QInputDialog::getDouble(this,      "MIP/mV ratio",        "Set amount of mV per MIP",   mVperMIP, 1., 100., 1); on_radBut_mV_toggled(true); }
         else                            { ADCUperMIP = QInputDialog::getDouble(this, "MIP/ADCunit ratio", "Set amount of ADC units per MIP", ADCUperMIP, 1., 100., 0); on_radButMIP_toggled(true); }
     }
+
+private slots:
+    void on_comboBoxCalibrationPM_activated(const QString &arg1) {
+        ui->tabWidget->setCurrentIndex(3);
+        QPlainTextEdit *p = ui->calTextOutput;
+        p->clear();
+        p->insertPlainText(arg1);
+        if (arg1 == "Time Alignment") {
+            on_buttonCalTimeOffset_clicked();
+        }
+        if (arg1 == "ADC_DELAY") {
+            on_buttonCalADCDelay_clicked();
+        }
+        if (arg1 == "CFD_ZERO") {
+            on_buttonCalCFDThreshold_clicked();
+        }
+    }
+
 };
 
 #endif // MAINWINDOW_H
