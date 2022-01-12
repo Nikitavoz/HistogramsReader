@@ -5,7 +5,6 @@
 #include <QMainWindow>
 #include <QElapsedTimer>
 #include <array>
-
 #include "ui_mainwindow.h"
 #include "switch.h"
 #include "FITelectronics.h"
@@ -30,7 +29,7 @@ public:
         Red0 = QPixmap(":/0R.png"), //not OK
         Red1 = QPixmap(":/1R.png"), //not OK
         b0icon = QPixmap(10,10), b1icon = b0icon;
-    const QFont regularValueFont = QFont("Consolas", 10, QFont::Normal);
+    QFont regularValueFont = QFont("Consolas", 10, QFont::Normal), tickFont = QFont("sans serif");
     QString
         OKstyle    = QString::asprintf("background-color: rgba(%d, %d, %d, 63)", OKcolor   .red(), OKcolor   .green(), OKcolor   .blue()),
         notOKstyle = QString::asprintf("background-color: rgba(%d, %d, %d, 63)", notOKcolor.red(), notOKcolor.green(), notOKcolor.blue());
@@ -88,14 +87,18 @@ public:
         ui(new Ui::MainWindow),
         settings(QCoreApplication::applicationName() + ".ini", QSettings::IniFormat)
     {
-        ui->setupUi(this);
+        ui->setupUi(this); //UI initialization
+        setWindowTitle(QCoreApplication::applicationName() + " v" + QCoreApplication::applicationVersion());
+        allWidgets = ui->centralwidget->findChildren<QWidget *>();
+        PMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*PM"));
+        TCMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*TCM"));
         recheck = new QAction(this);
         connect(recheck, &QAction::triggered, this, &MainWindow::recheckTarget);
         recheck->setShortcut(QKeySequence::Refresh);
         recheck->setShortcutContext(Qt::ApplicationShortcut);
         ui->tabWidget->addAction(recheck);
 //initial scaling (a label with fontsize 10 (Calibri) has pixelsize of 13 without system scaling and e.g. 20 at 150% scaling so widgets size should be recalculated)
-        fontSize_px = ui->labelValueIPaddress->fontInfo().pixelSize();
+        fontSize_px = ui->centralwidget->fontInfo().pixelSize();
         if (fontSize_px > 13) { //not default pixelsize for font of size 10
             double f = fontSize_px / 13.;
             resize(size()*f); //mainWindow
@@ -104,12 +107,8 @@ public:
             ui->groupBoxControl->setMinimumSize(ui->groupBoxControl->minimumSize()*f);
             ui->groupBoxTarget ->setMinimumSize(ui->groupBoxTarget ->minimumSize()*f);
             ui->groupBoxFile   ->setMinimumSize(ui->groupBoxFile   ->minimumSize()*f);
+            tickFont.setPixelSize(12*f);
         }
-//initialization
-        setWindowTitle(QCoreApplication::applicationName() + " v" + QCoreApplication::applicationVersion());
-        allWidgets = ui->groupBoxControl->findChildren<QWidget *>() + ui->groupBoxView->findChildren<QWidget *>();
-        PMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*PM"));
-        TCMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*TCM"));
         foreach(QCustomPlot *p, ui->Triggers->findChildren<QCustomPlot *>()) H[hTrig].append(new Histogram(p, H[hTrig].length(), hTrig));
         foreach(QCustomPlot *p, ui->Time    ->findChildren<QCustomPlot *>()) H[hTime].append(new Histogram(p, H[hTime].length(), hTime));
         foreach(QCustomPlot *p, ui->Charge  ->findChildren<QCustomPlot *>()) {
@@ -118,6 +117,7 @@ public:
         }
         b0icon.fill(H[hAmpl].first()->bars[0]->brush().color()); ui->radioADC0->setIcon(b0icon);
         b1icon.fill(H[hAmpl].first()->bars[1]->brush().color()); ui->radioADC1->setIcon(b1icon);
+
         foreach(QList<Histogram *> group, H) foreach(Histogram *h, group) {
             h->name = h->plot->objectName().remove(0, 8);
             QCPItemText *t = h->title;
@@ -138,6 +138,7 @@ public:
                 r->setAutoMargins(QCP::msNone);
                 r->setMargins(QMargins(1.6 * fontSize_px, fontSize_px + 2, 0.4 * fontSize_px, 2.2 * fontSize_px));
             QCPAxis *y = h->plot->yAxis;
+                y->setTickLabelFont(tickFont);
                 y->setTicker(linTicker);
                 y->grid()->setPen(QPen(QColor(140, 140, 140, 80), 1));
                 y->grid()->setZeroLinePen(Qt::NoPen);
@@ -148,6 +149,7 @@ public:
                 y->setLabelPadding(0);
                 y->setPadding(0);
             QCPAxis *x = h->plot->xAxis;
+                x->setTickLabelFont(tickFont);
                 x->setTicker(binTicker);
                 x->grid()->setPen(QPen(QColor(140, 140, 140, 80), 1));
                 x->grid()->setZeroLinePen(Qt::NoPen);
@@ -156,7 +158,7 @@ public:
                 x->setTickLabelPadding(0);
                 x->setLabelPadding(0);
                 x->setRange(minBin[h->type]-0.5, maxBin[h->type]+0.5);
-                x->setTickLabelRotation(-90);
+                x->setTickLabelRotation(-90);    
             connect(h->plot->xAxis, QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this, [=](const QCPRange &newRange) {
                 if (!ui->radioAdjustable->isChecked()) return;
                 h->plot->xAxis->setRange( qMax(newRange.lower, (minBin[h->type]-0.5) * h->bars[0]->width()), qMin(newRange.upper, (maxBin[h->type]+0.5) * h->bars[0]->width()) );
@@ -174,7 +176,6 @@ public:
         font.setStyleHint(QFont::TypeWriter);
         font.setFamily("courier");
         ui->calTextOutput->setFont(font);
-
 //signal-slot conections
         connect(&FEE, &IPbusTarget::IPbusStatusOK, this, [=]() {
            ui->labelStatus->setStyleSheet(OKstyle);
@@ -778,8 +779,7 @@ public slots:
         ui->spinBoxThreshold->setMaximum(curType == hTrig ? UINT32_MAX : UINT16_MAX);
         checkBoardSelection();
         axisLength_px = H[curType].first()->plot->width() - 2 * fontSize_px;
-//        foreach(Histogram *h, H[curType]) updatePlot(h);
-        foreach(Histogram *h, H[curType]) h->plot->replot();
+        foreach(Histogram *h, H[curType]) updatePlot(h);
     }
     void changeUnit(QList<MainWindow::Histogram *> &group, double newBinWidth) {
         bool defaultBin = newBinWidth == 1.;

@@ -60,10 +60,83 @@
     <property name="spacing">
      <number>0</number>
     </property>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBoxTarget">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>55</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Target</string>
+      </property>
+      <widget class="QPushButton" name="buttonChangeIPaddress">
+       <property name="geometry">
+        <rect>
+         <x>46</x>
+         <y>-1</y>
+         <width>50</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Change</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueIPaddress">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>19</y>
+         <width>94</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>172.020.075.180</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelStatus">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>36</y>
+         <width>96</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 44, 38, 63);</string>
+       </property>
+       <property name="text">
+        <string>99.7% data lost!</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </widget>
+    </item>
     <item row="0" column="1" rowspan="4">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="Triggers">
        <attribute name="title">
@@ -216,19 +289,30 @@
        <attribute name="title">
         <string>Calibration Logs</string>
        </attribute>
-       <widget class="QPlainTextEdit" name="calTextOutput">
-        <property name="geometry">
-         <rect>
-          <x>3</x>
-          <y>10</y>
-          <width>911</width>
-          <height>651</height>
-         </rect>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="readOnly">
-         <bool>true</bool>
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-       </widget>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPlainTextEdit" name="calTextOutput">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -562,6 +646,51 @@
       </widget>
      </widget>
     </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBoxFile">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Data file</string>
+      </property>
+      <widget class="QPushButton" name="buttonLoad">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>12</y>
+         <width>46</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load...</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="buttonSave">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>12</y>
+         <width>46</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save...</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBoxControl">
       <property name="minimumSize">
@@ -573,7 +702,7 @@
       <property name="title">
        <string/>
       </property>
-      <widget class="Switch" name="switchHistorgammingPM" native="true">
+      <widget class="Switch" name="switchHistorgammingPM">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -582,10 +711,10 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="text" stdset="0">
+       <property name="text">
         <string/>
        </property>
-       <property name="SwitchOnClick" stdset="0">
+       <property name="SwitchOnClick">
         <bool>false</bool>
        </property>
       </widget>
@@ -615,7 +744,7 @@
         <string>BC filter</string>
        </property>
       </widget>
-      <widget class="Switch" name="switchFilterPM" native="true">
+      <widget class="Switch" name="switchFilterPM">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -624,7 +753,7 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="SwitchOnClick" stdset="0">
+       <property name="SwitchOnClick">
         <bool>false</bool>
        </property>
       </widget>
@@ -935,7 +1064,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>189</y>
+         <y>191</y>
          <width>96</width>
          <height>19</height>
         </rect>
@@ -1193,10 +1322,10 @@
       <widget class="QComboBox" name="comboBoxCalibrationPM">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>2</x>
          <y>191</y>
-         <width>91</width>
-         <height>16</height>
+         <width>96</width>
+         <height>19</height>
         </rect>
        </property>
        <item>
@@ -1218,7 +1347,7 @@
       <widget class="QLabel" name="labelCalibrationPM">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>2</x>
          <y>175</y>
          <width>96</width>
          <height>13</height>
@@ -1226,124 +1355,6 @@
        </property>
        <property name="text">
         <string>Calibration</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QGroupBox" name="groupBoxFile">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>35</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Data file</string>
-      </property>
-      <widget class="QPushButton" name="buttonLoad">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>12</y>
-         <width>46</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Load...</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="buttonSave">
-       <property name="geometry">
-        <rect>
-         <x>3</x>
-         <y>12</y>
-         <width>46</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Save...</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBoxTarget">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>55</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Target</string>
-      </property>
-      <widget class="QPushButton" name="buttonChangeIPaddress">
-       <property name="geometry">
-        <rect>
-         <x>46</x>
-         <y>-1</y>
-         <width>50</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Change</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="labelValueIPaddress">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>19</y>
-         <width>94</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Calibri</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>172.020.075.180</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="labelStatus">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>36</y>
-         <width>96</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Calibri</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgba(255, 44, 38, 63);</string>
-       </property>
-       <property name="text">
-        <string>99.7% data lost!</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
