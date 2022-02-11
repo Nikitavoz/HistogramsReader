@@ -5,11 +5,13 @@
 #include <QMainWindow>
 #include <QElapsedTimer>
 #include <array>
+
 #include "ui_mainwindow.h"
 #include "switch.h"
 #include "FITelectronics.h"
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
+#include <QElapsedTimer>
 
 #include "qcustomplot.h"
 
@@ -58,7 +60,7 @@ public:
         double getTickStep(const QCPRange &range) { return range.size() > axisLength_px / fontSize_px ? roundUpStep(range.size() * fontSize_px / axisLength_px) : 1;  }
         int getSubTickCount(double tickStep) { return tickStep/roundDownOrder(tickStep) - 1; }
     };
-    QSharedPointer<QCPAxisTicker> binTicker = QSharedPointer<xAxisTicker>(new xAxisTicker(fontSize_px, axisLength_px)), floatTicker = QSharedPointer<QCPAxisTicker>(new QCPAxisTicker);;
+    QSharedPointer<QCPAxisTicker> binTicker = QSharedPointer<xAxisTicker>(new xAxisTicker(fontSize_px, axisLength_px)), floatTicker = QSharedPointer<QCPAxisTicker>(new QCPAxisTicker);
     struct Histogram {
         QCustomPlot *plot;
         const quint8 iCh;
@@ -313,8 +315,9 @@ public:
         foreach(QWidget *w, TCMwidgets) w->setVisible(FEE.iBd == 0);
     }
 
-    bool setAttenuator(float db) {
+    bool setAttenuator(quint32 steps) {
         QPlainTextEdit *p = ui->calTextOutput;
+#if 0
         //p->clear();
         QSerialPort s(this);
         s.setPortName("COM3");
@@ -341,11 +344,45 @@ public:
             s.close();
         }
         return true;
+#else
+        int const maxNumBUSY = 1000;
+        quint32 reg = FEE.readAtten();
+        if ((reg & (1<<15)) == 1<<15) { // not found
+            p->insertPlainText("Attenuator not connected\n");
+            return false;
+        }
+        int i = 0;
+        for (; i<maxNumBUSY && (reg&(1<<14)); ++i) {
+            Sleep(10);
+            reg = FEE.readAtten();
+        }
+        if (i) {
+            p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
+        }
+        if (i == maxNumBUSY) {
+            p->insertPlainText("BUSY timeout\n");
+            return false;
+        }
+        p->insertPlainText(QString::asprintf("Attenuator: steps=%d -> %d\n", (reg&((1<<14)-1)), steps));
+        reg = steps | (reg & ((1<<14)|(1<<15)));
+        FEE.writeAtten(reg);
+        reg = FEE.readAtten();
+        for (i=0; i<maxNumBUSY && (reg&(1<<14)); ++i) {
+            //p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
+            Sleep(10);
+            reg = FEE.readAtten();
+        }
+        p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
+        if (i == maxNumBUSY) {
+            p->insertPlainText("BUSY timeout\n");
+            return false;
+        }
+        return true;
+#endif
     }
 
     // calibration
     std::string formatPM() const {
-        QString str;
         return QString::asprintf("%c%d",
                            FEE.iBd>=11 ? 'C' : 'A',
                            FEE.iBd - 10*(FEE.iBd>=11) - 1).toStdString();
@@ -360,9 +397,27 @@ public:
             }
             double sumWX = 0;
             double sumWXX = 0;
+            int maxTime = 0;
+            unsigned maxCount = 0;
             for (auto i=0; i<4096; ++i) {
-                double const weight = double(FEE.DCh[ch].binValueTime(i))/sumW;
                 auto const signedTime = (i>=2048 ? i-4096 : i);
+                if (FEE.DCh[ch].binValueTime(i) > maxCount) {
+                    maxCount = FEE.DCh[ch].binValueTime(i);
+                    maxTime = signedTime;
+                }
+                double const weight = double(FEE.DCh[ch].binValueTime(i))/sumW;
+
+                sumWX  += weight * signedTime;
+                sumWXX += weight * signedTime * signedTime;
+            }
+            sumWX = 0;
+            sumWXX = 0;
+            for (auto i=0; i<4096; ++i) {
+                auto const signedTime = (i>=2048 ? i-4096 : i);
+                if (abs(signedTime - maxTime) > 20) {
+                    continue;
+                }
+                double const weight = double(FEE.DCh[ch].binValueTime(i))/sumW;
                 sumWX  += weight * signedTime;
                 sumWXX += weight * signedTime * signedTime;
             }
@@ -515,29 +570,67 @@ public:
         sb->setValue(sb->maximum());
     }
 
-    void on_buttonCalCFDThreshold_clicked() {
-        ui->tabWidget->setCurrentIndex(3);
+    bool adjustAttenuatorADC(int ch0, float refADCValue, quint32& attenSteps) {
         QPlainTextEdit *p = ui->calTextOutput;
-        p->clear();
+        p->insertPlainText(QString::asprintf("adjustAttenuatorADC CH%02d refADCValue=%5.1f attenSteps=%d\n", ch0, refADCValue, attenSteps));
+        for (; attenSteps > 1000; attenSteps -= 50) {
+            setAttenuator(attenSteps);
+            FEE.reset();
+            Sleep(10);
+            FEE.switchHistogramming(true);
+            Sleep(200);
+            FEE.readHistograms(hAmpl);
+            Histogram *h = H[hAmpl][ch0];
+            double const w = h->bars[ch0]->width();
+            h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
+            p->insertPlainText(QString::asprintf("%d %5d %f %f\n", attenSteps, h->stats.sum, h->stats.mean * w, h->stats.RMS * w));
+            auto const charge = h->stats.mean * w;
+            QScrollBar *sb = p->verticalScrollBar();
+            sb->setValue(sb->maximum());
+            qApp->processEvents();
+            if (charge > refADCValue) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    int calCFDThreshold(int ch0, bool coarse=true, int startCFDOffset=0) {
+        QPlainTextEdit *p = ui->calTextOutput;
 
         quint32 adcRegs[4*12];
         bool  success = FEE.readADCRegisters(adcRegs);
         quint32 adcRegsOld[4*12];
         std::copy(adcRegs, adcRegs+4*12, adcRegsOld);
 
-        double meanTime[12];
-        double stdTime[12];
-        int timeOK[12];
+        double  meanTime[12];
+        double  stdTime[12];
+        int     timeOK[12];
         quint32 counters[24];
         quint32 countersOld[24];
+        quint32 const regAttenuator = FEE.readAtten();
+        quint32  attenSteps = regAttenuator & ((1<<14)-1);
+        quint32 const attenStepsOrig = attenSteps;
 
-        std::array<float,3> attenuation = {15,20,25};
-        std::array<int,21> cfdZERO; // -500:50:500
+        std::array<double,3> attenuation = {ADCUperMIP,ADCUperMIP*sqrt(10.0),ADCUperMIP*10.0};
+        std::array<int,21> cfdZERO;
         for (int i=0; i<cfdZERO.size(); ++i) {
-            cfdZERO[i] = std::round(500 * double(i-int(cfdZERO.size()/2)) / double(cfdZERO.size()-1) * 2);
+            if (coarse) {  // coarse scan: -500:50:500
+                cfdZERO[i] = std::round(500 * double(i-int(cfdZERO.size()/2)) / double(cfdZERO.size()-1) * 2);
+            } else {       //  fine  scan: startCFDOffset - 50 + [0:5:100]
+                cfdZERO[i] = startCFDOffset - 50 + 5*i;
+            }
         }
 
         struct MeasurementValue {
+            MeasurementValue(double tm=0, double tr=0, int ok=0, double r=0, double cm=0, double cr=0)
+                : tMean(tm)
+                , tRMS(tr)
+                , tOK(ok)
+                , rate(r)
+                , cMean(cm)
+                , cRMS(cr) {}
+            ~MeasurementValue() {}
              double tMean = 0.0;
              double tRMS  = 0.0;
              int    tOK   = false;
@@ -552,10 +645,26 @@ public:
              }
         };
 
-        std::array<std::array<std::array<MeasurementValue, attenuation.size()>, cfdZERO.size()>, 12> times;
+        float charge0 = 0.0;
+        std::array<std::array<std::array<MeasurementValue, attenuation.size()>, cfdZERO.size()>, 12> times = {};
         for (int i=0; i<attenuation.size(); ++i) {
-            setAttenuator(attenuation[i]);
-            //p->insertPlainText(QString::asprintf("%4.0fdb: ", attenuation[i]));
+            if (coarse && i==1) {
+                continue;
+            }
+            if (i == 0) {
+                FEE.reset();
+                Sleep(10);
+                FEE.switchHistogramming(true);
+                Sleep(500);
+                FEE.readHistograms(hAmpl);
+                Histogram *h = H[hAmpl][ch0];
+                double const w = h->bars[ch0]->width();
+                h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
+                p->insertPlainText(QString::asprintf("%d %5d %f %f\n", attenSteps, h->stats.sum, h->stats.mean * w, h->stats.RMS * w));
+                charge0 = h->stats.mean * w;
+            } else {
+                adjustAttenuatorADC(ch0, attenuation[i], attenSteps);
+            }
             Sleep(100);
             for (int j=0; j<cfdZERO.size(); ++j) {
                 for (int ch=0; ch<12; ++ch) {
@@ -563,9 +672,9 @@ public:
                 }
                 p->insertPlainText(QString::asprintf("%5d", cfdZERO[j]));
                 FEE.reset();
-                Sleep(10);
+                //Sleep(10);
                 success = FEE.writeADCRegisters(adcRegs);
-                Sleep(10);
+                Sleep(20);
 
                 FEE.switchHistogramming(true);
                 success = FEE.readCounters(countersOld);
@@ -575,7 +684,7 @@ public:
                 computeMeanTime(meanTime,stdTime,timeOK);
                 for (int ch=0; ch<12; ++ch) {
                     times[ch][j][i] = {meanTime[ch], stdTime[ch], timeOK[ch],
-                                       double(counters[ch]-countersOld[ch])/0.2,
+                                       double(counters[2*ch]-countersOld[2*ch])/0.2,
                                        0.0, 0.0};
 #if 0
                     p->insertPlainText(QString::asprintf(" %s  CH%02d %7.2f %7.2f %s  %s\n",
@@ -593,13 +702,18 @@ public:
             p->insertPlainText("\n");
         }
         p->insertPlainText("\n\n");
-        setAttenuator(20.0);
-        for (int ch=0; ch<12; ++ch) {
+        setAttenuator(attenStepsOrig);
+        //FEE.writeAtten(regAttenuator); // restore
+
+        int newCFDValue = -10000; // set to invalid
+        for (int ch=ch0; ch<ch0+1; ++ch) {
             p->insertPlainText(" PM  CH  CFD_ZERO");
             for (int j=0; j<attenuation.size(); ++j) {
-                p->insertPlainText(QString::asprintf("%6.0fdB       ", attenuation[j]));
+                p->insertPlainText(QString::asprintf("%6.0fADC      ", attenuation[j]));
             }
             p->insertPlainText(" | Time Variation\n");
+            float timeDifferenceLast = 100;
+            bool haveSeenNegativeTimeDifference = false;
             for (int i=0; i<cfdZERO.size(); ++i) {
                 p->insertPlainText(QString::asprintf(" %s  CH%02d %6d ",
                                                formatPM().c_str(),
@@ -607,8 +721,30 @@ public:
                 for (int j=0; j<attenuation.size(); ++j) {
                     p->insertPlainText(QString::asprintf("%s", times[ch][i][j].format().c_str()));
                 }
-                auto const tMinMax = std::minmax_element(times[ch][i].begin(), times[ch][i].end());
-                p->insertPlainText(QString::asprintf(" | %7.2f\n", tMinMax.second->tMean - tMinMax.first->tMean));
+                auto const tMinMax        = std::minmax_element(times[ch][i].begin(), times[ch][i].end());
+                auto const timeDifference = times[ch][i].front().tMean - times[ch][i].back().tMean;
+                if (!haveSeenNegativeTimeDifference && timeDifference < 0) {
+                    haveSeenNegativeTimeDifference = true;
+                }
+                p->insertPlainText(QString::asprintf(" | %7.2f", tMinMax.second->tMean - tMinMax.first->tMean));
+                p->insertPlainText(QString::asprintf(" %+8.2f", timeDifference));
+                if (coarse) {
+                    if (times[ch][i][0].rate >= 500 && timeDifference > 0 && timeDifferenceLast <= 0 && newCFDValue == -10000) {
+                        float slope = (timeDifference - timeDifferenceLast) / (cfdZERO[i]-cfdZERO[i-1]);
+                        newCFDValue = 5*std::lround((cfdZERO[i-1] - timeDifferenceLast / slope)/5);
+                        p->insertPlainText(QString::asprintf(" <----- ***** (%d)\n", newCFDValue));
+                   } else {
+                        p->insertPlainText("\n");
+                   }
+                } else { // fine adjustment
+                    if (times[ch][i][0].rate >= 999 && timeDifference >= 1.5 && haveSeenNegativeTimeDifference && newCFDValue == -10000) {
+                        newCFDValue = cfdZERO[i];
+                        p->insertPlainText(" <----- *****\n");
+                    } else {
+                        p->insertPlainText("\n");
+                    }
+                }
+                timeDifferenceLast = timeDifference;
             }
             p->insertPlainText("\n\n");
         }
@@ -616,6 +752,60 @@ public:
         p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
         QScrollBar *sb = p->verticalScrollBar();
         sb->setValue(sb->maximum());
+        return newCFDValue;
+    }
+    void on_buttonCalCFDThreshold_clicked() {
+        ui->tabWidget->setCurrentIndex(3);
+        QPlainTextEdit *p = ui->calTextOutput;
+        p->clear();
+
+        //setAttenuator(7100);
+        changeUnit(H[hAmpl], 1.); ui->buttonTune->setVisible(false);
+        //return;
+        int ch0 = 1; // replace with a loop
+
+        //quint32 const regAttenuator = FEE.readAtten();
+        //quint32 attenSteps = regAttenuator & ((1<<14)-1);
+        quint32 attenSteps = 7500;
+
+        p->insertPlainText(QString::asprintf("ADC ADJUSTMENT for CH=%02d to %6.1f\n================================\n\n", ch0+1, ADCUperMIP));
+        bool success = adjustAttenuatorADC(ch0, ADCUperMIP, attenSteps);
+        if (!success) {
+            p->insertPlainText(QString::asprintf("ADC ADJUSTMENT for CH=%02d has failed\n\n", ch0+1));
+            return;
+        }
+        quint32 attenSteps1MIP = attenSteps;
+
+        p->insertPlainText(QString::asprintf("COARSE SCAN for CH=%02d\n================================\n\n", ch0+1));
+        int newCFDValue = calCFDThreshold(ch0, true);
+        if (newCFDValue == -10000) {
+            p->insertPlainText("COARSE SCAN has failed\n");
+            QScrollBar *sb = p->verticalScrollBar();
+            sb->setValue(sb->maximum());
+            return;
+        }
+        p->insertPlainText(QString::asprintf("\n================================\nFINE  SCAN for CH=%02d starting at %5d\n================================\n\n", ch0+1, newCFDValue));
+
+        newCFDValue = calCFDThreshold(ch0, false, newCFDValue);
+        if (newCFDValue == -10000) {
+            setAttenuator(attenSteps1MIP);
+            p->insertPlainText(QString::asprintf("FINE  SCAN for CH=%02d has failed\n", ch0+1));
+            QScrollBar *sb = p->verticalScrollBar();
+            sb->setValue(sb->maximum());
+            return;
+        } else {
+            quint32 adcRegs[4*12];
+            bool  success = FEE.readADCRegisters(adcRegs);
+            p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+
+            p->insertPlainText(QString::asprintf("new CFD_ZERO setting for CH=%02d: %5d (was: %5d)\n", ch0+1, newCFDValue, adcRegs[4*ch0+1]));
+            adcRegs[4*ch0+1] = newCFDValue;
+            success = FEE.writeADCRegisters(adcRegs);
+            p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+            setAttenuator(attenSteps1MIP);
+            QScrollBar *sb = p->verticalScrollBar();
+            sb->setValue(sb->maximum());
+        }
     }
 
 public slots:
