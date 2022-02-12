@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+	CalibrationParameterDialog.h \
 	qcustomplot.h \
 	mainwindow.h \
 	IPbusHeaders.h \

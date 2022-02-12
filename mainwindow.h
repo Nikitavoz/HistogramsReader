@@ -13,6 +13,8 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QElapsedTimer>
 
+#include "CalibrationParameterDialog.h"
+
 #include "qcustomplot.h"
 
 static inline double roundDownOrder(double v) { return pow(10, floor( log10(fabs(v)) )); } //round down one decimal order of magnitude
@@ -595,7 +597,7 @@ public:
         return false;
     }
 
-    int calCFDThreshold(int ch0, bool coarse=true, int startCFDOffset=0) {
+    int calCFDThreshold(int ch0, std::array<quint32,3>& attenSteps, float adcPerMIP, bool coarse=true, int startCFDOffset=0) {
         QPlainTextEdit *p = ui->calTextOutput;
 
         quint32 adcRegs[4*12];
@@ -608,11 +610,8 @@ public:
         int     timeOK[12];
         quint32 counters[24];
         quint32 countersOld[24];
-        quint32 const regAttenuator = FEE.readAtten();
-        quint32  attenSteps = regAttenuator & ((1<<14)-1);
-        quint32 const attenStepsOrig = attenSteps;
 
-        std::array<double,3> attenuation = {ADCUperMIP,ADCUperMIP*sqrt(10.0),ADCUperMIP*10.0};
+        std::array<double,3> attenuation = {adcPerMIP,adcPerMIP*sqrt(10.0),adcPerMIP*10.0};
         std::array<int,21> cfdZERO;
         for (int i=0; i<cfdZERO.size(); ++i) {
             if (coarse) {  // coarse scan: -500:50:500
@@ -645,25 +644,19 @@ public:
              }
         };
 
-        float charge0 = 0.0;
         std::array<std::array<std::array<MeasurementValue, attenuation.size()>, cfdZERO.size()>, 12> times = {};
+        quint32 steps = FEE.readAtten() & ((1<<14)|(1<<15));
+        quint32 attenStepsOrig = steps;
+
         for (int i=0; i<attenuation.size(); ++i) {
+            if (coarse) {
+                adjustAttenuatorADC(ch0, attenuation[i], steps);
+                attenSteps[i] = steps;
+            } else { // fine calibration
+                setAttenuator(attenSteps[i]);
+            }
             if (coarse && i==1) {
                 continue;
-            }
-            if (i == 0) {
-                FEE.reset();
-                Sleep(10);
-                FEE.switchHistogramming(true);
-                Sleep(500);
-                FEE.readHistograms(hAmpl);
-                Histogram *h = H[hAmpl][ch0];
-                double const w = h->bars[ch0]->width();
-                h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
-                p->insertPlainText(QString::asprintf("%d %5d %f %f\n", attenSteps, h->stats.sum, h->stats.mean * w, h->stats.RMS * w));
-                charge0 = h->stats.mean * w;
-            } else {
-                adjustAttenuatorADC(ch0, attenuation[i], attenSteps);
             }
             Sleep(100);
             for (int j=0; j<cfdZERO.size(); ++j) {
@@ -706,48 +699,48 @@ public:
         //FEE.writeAtten(regAttenuator); // restore
 
         int newCFDValue = -10000; // set to invalid
-        for (int ch=ch0; ch<ch0+1; ++ch) {
-            p->insertPlainText(" PM  CH  CFD_ZERO");
-            for (int j=0; j<attenuation.size(); ++j) {
-                p->insertPlainText(QString::asprintf("%6.0fADC      ", attenuation[j]));
-            }
-            p->insertPlainText(" | Time Variation\n");
-            float timeDifferenceLast = 100;
-            bool haveSeenNegativeTimeDifference = false;
-            for (int i=0; i<cfdZERO.size(); ++i) {
-                p->insertPlainText(QString::asprintf(" %s  CH%02d %6d ",
-                                               formatPM().c_str(),
-                                               ch, cfdZERO[i]));
-                for (int j=0; j<attenuation.size(); ++j) {
-                    p->insertPlainText(QString::asprintf("%s", times[ch][i][j].format().c_str()));
-                }
-                auto const tMinMax        = std::minmax_element(times[ch][i].begin(), times[ch][i].end());
-                auto const timeDifference = times[ch][i].front().tMean - times[ch][i].back().tMean;
-                if (!haveSeenNegativeTimeDifference && timeDifference < 0) {
-                    haveSeenNegativeTimeDifference = true;
-                }
-                p->insertPlainText(QString::asprintf(" | %7.2f", tMinMax.second->tMean - tMinMax.first->tMean));
-                p->insertPlainText(QString::asprintf(" %+8.2f", timeDifference));
-                if (coarse) {
-                    if (times[ch][i][0].rate >= 500 && timeDifference > 0 && timeDifferenceLast <= 0 && newCFDValue == -10000) {
-                        float slope = (timeDifference - timeDifferenceLast) / (cfdZERO[i]-cfdZERO[i-1]);
-                        newCFDValue = 5*std::lround((cfdZERO[i-1] - timeDifferenceLast / slope)/5);
-                        p->insertPlainText(QString::asprintf(" <----- ***** (%d)\n", newCFDValue));
-                   } else {
-                        p->insertPlainText("\n");
-                   }
-                } else { // fine adjustment
-                    if (times[ch][i][0].rate >= 999 && timeDifference >= 1.5 && haveSeenNegativeTimeDifference && newCFDValue == -10000) {
-                        newCFDValue = cfdZERO[i];
-                        p->insertPlainText(" <----- *****\n");
-                    } else {
-                        p->insertPlainText("\n");
-                    }
-                }
-                timeDifferenceLast = timeDifference;
-            }
-            p->insertPlainText("\n\n");
+        p->insertPlainText(" PM  CH  CFD_ZERO");
+        for (int j=0; j<attenuation.size(); ++j) {
+            p->insertPlainText(QString::asprintf("%6.0fADC      ", attenuation[j]));
         }
+        p->insertPlainText(" | Time Variation\n");
+        float timeDifferenceLast = 100;
+        bool haveSeenNegativeTimeDifference = false;
+        for (int i=0; i<cfdZERO.size(); ++i) {
+            p->insertPlainText(QString::asprintf(" %s  CH%02d %6d ",
+                                           formatPM().c_str(),
+                                           ch0, cfdZERO[i]));
+            for (int j=0; j<attenuation.size(); ++j) {
+                p->insertPlainText(QString::asprintf("%s", times[ch0][i][j].format().c_str()));
+            }
+            auto const tMinMax        = std::minmax_element(times[ch0][i].begin(), times[ch0][i].end());
+            auto const timeDifference = times[ch0][i].front().tMean - times[ch0][i].back().tMean;
+            if (!haveSeenNegativeTimeDifference && timeDifference < 0) {
+                haveSeenNegativeTimeDifference = true;
+            }
+            p->insertPlainText(QString::asprintf(" | %7.2f", tMinMax.second->tMean - tMinMax.first->tMean));
+            p->insertPlainText(QString::asprintf(" %+8.2f", timeDifference));
+            if (coarse) {
+                if (times[ch0][i][0].rate >= 500 && timeDifference > 0 && timeDifferenceLast <= 0 && newCFDValue == -10000) {
+                    // linear interpolation
+                    float slope = (timeDifference - timeDifferenceLast) / (cfdZERO[i]-cfdZERO[i-1]);
+                    newCFDValue = 5*std::lround((cfdZERO[i-1] - timeDifferenceLast / slope)/5);
+                    p->insertPlainText(QString::asprintf(" <----- ***** (%d)\n", newCFDValue));
+               } else {
+                    p->insertPlainText("\n");
+               }
+            } else { // fine adjustment
+                if (times[ch0][i][0].rate >= 999 && timeDifference >= 1.5 && haveSeenNegativeTimeDifference && newCFDValue == -10000) {
+                    newCFDValue = cfdZERO[i];
+                    p->insertPlainText(" <----- *****\n");
+                } else {
+                    p->insertPlainText("\n");
+                }
+            }
+            timeDifferenceLast = timeDifference;
+        }
+        p->insertPlainText("\n\n");
+
         success = FEE.writeADCRegisters(adcRegsOld);
         p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
         QScrollBar *sb = p->verticalScrollBar();
@@ -755,56 +748,67 @@ public:
         return newCFDValue;
     }
     void on_buttonCalCFDThreshold_clicked() {
+
+        CalibrationParameterDialog dialog(ADCUperMIP, 7200, this);
+        dialog.adjustSize();
+        dialog.setModal(true);
+
+        if(dialog.exec() != QDialog::Accepted) {
+            return;
+        }
+
         ui->tabWidget->setCurrentIndex(3);
         QPlainTextEdit *p = ui->calTextOutput;
         p->clear();
 
-        //setAttenuator(7100);
+        p->insertPlainText(QString::asprintf("START %g %d ", dialog.getADCPerMip(), dialog.getInitialSteps()));
+        for (int ch=0; ch<12; ++ch) {
+            p->insertPlainText(QString::asprintf("%d", dialog.isChannelSelected(ch)));
+        }
+        p->insertPlainText("\n");
+        return;
+
         changeUnit(H[hAmpl], 1.); ui->buttonTune->setVisible(false);
         //return;
-        int ch0 = 1; // replace with a loop
 
-        //quint32 const regAttenuator = FEE.readAtten();
-        //quint32 attenSteps = regAttenuator & ((1<<14)-1);
-        quint32 attenSteps = 7500;
+        for (int ch0=0; ch0<12; ++ch0) {
+            if (!dialog.isChannelSelected(ch0)) {
+                continue;
+            }
+            setAttenuator(dialog.getInitialSteps());
 
-        p->insertPlainText(QString::asprintf("ADC ADJUSTMENT for CH=%02d to %6.1f\n================================\n\n", ch0+1, ADCUperMIP));
-        bool success = adjustAttenuatorADC(ch0, ADCUperMIP, attenSteps);
-        if (!success) {
-            p->insertPlainText(QString::asprintf("ADC ADJUSTMENT for CH=%02d has failed\n\n", ch0+1));
-            return;
-        }
-        quint32 attenSteps1MIP = attenSteps;
+            std::array<quint32,3> attenSteps;
 
-        p->insertPlainText(QString::asprintf("COARSE SCAN for CH=%02d\n================================\n\n", ch0+1));
-        int newCFDValue = calCFDThreshold(ch0, true);
-        if (newCFDValue == -10000) {
-            p->insertPlainText("COARSE SCAN has failed\n");
-            QScrollBar *sb = p->verticalScrollBar();
-            sb->setValue(sb->maximum());
-            return;
-        }
-        p->insertPlainText(QString::asprintf("\n================================\nFINE  SCAN for CH=%02d starting at %5d\n================================\n\n", ch0+1, newCFDValue));
+            p->insertPlainText(QString::asprintf("COARSE SCAN for CH=%02d\n================================\n\n", ch0+1));
+            int newCFDValue = calCFDThreshold(ch0, attenSteps, dialog.getADCPerMip(), true);
+            if (newCFDValue == -10000) {
+                p->insertPlainText("COARSE SCAN has failed\n");
+                QScrollBar *sb = p->verticalScrollBar();
+                sb->setValue(sb->maximum());
+                return;
+            }
+            p->insertPlainText(QString::asprintf("\n================================\nFINE  SCAN for CH=%02d starting at %5d\n================================\n\n", ch0+1, newCFDValue));
 
-        newCFDValue = calCFDThreshold(ch0, false, newCFDValue);
-        if (newCFDValue == -10000) {
-            setAttenuator(attenSteps1MIP);
-            p->insertPlainText(QString::asprintf("FINE  SCAN for CH=%02d has failed\n", ch0+1));
-            QScrollBar *sb = p->verticalScrollBar();
-            sb->setValue(sb->maximum());
-            return;
-        } else {
-            quint32 adcRegs[4*12];
-            bool  success = FEE.readADCRegisters(adcRegs);
-            p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+            newCFDValue = calCFDThreshold(ch0, attenSteps, dialog.getADCPerMip(), false, newCFDValue);
+            if (newCFDValue == -10000) {
+                setAttenuator(attenSteps[0]);
+                p->insertPlainText(QString::asprintf("FINE  SCAN for CH=%02d has failed\n", ch0+1));
+                QScrollBar *sb = p->verticalScrollBar();
+                sb->setValue(sb->maximum());
+                return;
+            } else {
+                quint32 adcRegs[4*12];
+                bool  success = FEE.readADCRegisters(adcRegs);
+                p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
 
-            p->insertPlainText(QString::asprintf("new CFD_ZERO setting for CH=%02d: %5d (was: %5d)\n", ch0+1, newCFDValue, adcRegs[4*ch0+1]));
-            adcRegs[4*ch0+1] = newCFDValue;
-            success = FEE.writeADCRegisters(adcRegs);
-            p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
-            setAttenuator(attenSteps1MIP);
-            QScrollBar *sb = p->verticalScrollBar();
-            sb->setValue(sb->maximum());
+                p->insertPlainText(QString::asprintf("new CFD_ZERO setting for CH=%02d: %5d (was: %5d)\n", ch0+1, newCFDValue, adcRegs[4*ch0+1]));
+                adcRegs[4*ch0+1] = newCFDValue;
+                success = FEE.writeADCRegisters(adcRegs);
+                p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
+                setAttenuator(attenSteps[0]);
+                QScrollBar *sb = p->verticalScrollBar();
+                sb->setValue(sb->maximum());
+            }
         }
     }
 
