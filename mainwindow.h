@@ -89,6 +89,8 @@ public:
     };
     QVector<QList<Histogram *>> H {3};
 
+    CalibrationParameterDialog* _calibrationDialog;
+
     explicit MainWindow(QWidget *parent = nullptr):
         QMainWindow(parent),
         ui(new Ui::MainWindow),
@@ -243,6 +245,7 @@ public:
         updateBoardsList(0);
         on_tabWidget_currentChanged(0);
         FEE.reconnect();
+        _calibrationDialog = new CalibrationParameterDialog(ADCUperMIP, 7200, this);
     }
 
     ~MainWindow() {
@@ -320,7 +323,7 @@ public:
         foreach(QWidget *w, TCMwidgets) w->setVisible(FEE.iBd == 0);
     }
 
-    bool setAttenuator(quint32 steps) {
+    bool setAttenuator(quint32 steps, bool verbose = false) {
         QPlainTextEdit *p = ui->calTextOutput;
 #if 0
         //p->clear();
@@ -361,14 +364,18 @@ public:
             Sleep(10);
             reg = FEE.readAtten();
         }
+#if 0
         if (i) {
             p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
         }
+#endif
         if (i == maxNumBUSY) {
             p->insertPlainText("BUSY timeout\n");
             return false;
         }
-        p->insertPlainText(QString::asprintf("Attenuator: steps=%d -> %d\n", (reg&((1<<14)-1)), steps));
+        if (verbose) {
+            p->insertPlainText(QString::asprintf("Attenuator: steps=%d -> %d\n", (reg&((1<<14)-1)), steps));
+        }
         reg = steps | (reg & ((1<<14)|(1<<15)));
         FEE.writeAtten(reg);
         reg = FEE.readAtten();
@@ -377,7 +384,7 @@ public:
             Sleep(10);
             reg = FEE.readAtten();
         }
-        p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
+        // p->insertPlainText(QString::asprintf("BUSY count=%3d\n",i));
         if (i == maxNumBUSY) {
             p->insertPlainText("BUSY timeout\n");
             return false;
@@ -575,31 +582,43 @@ public:
         sb->setValue(sb->maximum());
     }
 
-    bool adjustAttenuatorADC(CalibrationPlots *calPlots, int ch0, float refADCValue, quint32& attenSteps) {
+    bool adjustAttenuatorADC(CalibrationPlots& calPlots, int ch0, float refADCValue, quint32& attenSteps) {
         QPlainTextEdit *p = ui->calTextOutput;
-        p->insertPlainText(QString::asprintf("adjustAttenuatorADC CH%02d refADCValue=%5.1f attenSteps=%d\n", ch0, refADCValue, attenSteps));
+        p->insertPlainText(QString::asprintf("adjustAttenuatorADC CH%02d refADCValue=%5.1f attenSteps=%d\n", ch0+1, refADCValue, attenSteps));
         if (attenSteps == 0) {
             return false;
         }
-        for (; attenSteps > 1000; attenSteps -= 50) {
+        float lastCharge = 0.0f;
+        qint32 deltaAttenSteps = -50;
+        for (; attenSteps > 1000; attenSteps += deltaAttenSteps) {
             setAttenuator(attenSteps);
             FEE.reset();
             Sleep(10);
             FEE.switchHistogramming(true);
             Sleep(200);
             FEE.readHistograms(hAmpl);
+
             Histogram *h = H[hAmpl][ch0];
-            double const w = h->bars[ch0]->width();
+            double const w = h->bars[0]->width();
             h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
-            p->insertPlainText(QString::asprintf("%d %5d %f %f\n", attenSteps, h->stats.sum, h->stats.mean * w, h->stats.RMS * w));
+            p->insertPlainText(QString::asprintf("steps=%5d ADC=%6.1f+-%.1f (%d)\n", attenSteps, h->stats.mean * w, h->stats.RMS * w, h->stats.sum));
             auto const charge = h->stats.mean * w;
-            calPlots->addPoint(attenSteps, charge);
+            calPlots.addPoint(attenSteps, charge);
             QScrollBar *sb = p->verticalScrollBar();
             sb->setValue(sb->maximum());
             qApp->processEvents();
-            if (charge > refADCValue) {
+            if (charge > refADCValue && lastCharge > 0) {
+                // linear interpolation
+                float slope = float(deltaAttenSteps) / (charge - lastCharge); // steps/ADC
+                int attenStepsI = std::lround(float(attenSteps) - float(deltaAttenSteps) + slope * (refADCValue - lastCharge));
+                p->insertPlainText(QString::asprintf("Interpolation lastCharge=%f charge=%f slope=%f steps=%d [%d,%d]\n",
+                                                     lastCharge, charge, slope, attenStepsI, attenSteps-deltaAttenSteps,attenSteps));
+                calPlots.addPoint(attenStepsI, refADCValue, true);
+                attenSteps = attenStepsI;
+                setAttenuator(attenSteps, true);
                 return true;
             }
+            lastCharge = charge;
         }
         return false;
     }
@@ -610,14 +629,7 @@ public:
         QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
         ui->calTextOutput->document()->documentLayout()->registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
 
-
-        // insert the current plot at the cursor position. QCPDocumentObject::generatePlotFormat creates a
-        // vectorized snapshot of the passed plot (with the specified width and height) which gets inserted
-        // into the text document.
-        double width = 1200;// ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbWidth->value();
-        double height = 600;// ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbHeight->value();
-        ui->calTextOutput->width();
-        CalibrationPlots *calPlots = new CalibrationPlots;
+        CalibrationPlots calPlots;
 
         quint32 adcRegs[4*12];
         bool  success = FEE.readADCRegisters(adcRegs);
@@ -639,9 +651,9 @@ public:
                 cfdZERO[i] = startCFDOffset - 100 + 5*i;
             }
         }
-        calPlots->setAxisRange(-200, 200, cfdZERO.front(), cfdZERO.back());
-        calPlots->setTitles(attenuation);
-
+        calPlots.setAxisRange(-200, 200, cfdZERO.front(), cfdZERO.back());
+        calPlots.setTitles(attenuation);
+#if 1
         struct MeasurementValue {
             MeasurementValue(double tm=0, double tr=0, int ok=0, double r=0, double cm=0, double cr=0)
                 : tMean(tm)
@@ -675,10 +687,11 @@ public:
                 adjustAttenuatorADC(calPlots, ch0, attenuation[i], steps);
                 attenSteps[i] = steps;
             } else { // fine calibration
-                setAttenuator(attenSteps[i]);
+                setAttenuator(attenSteps[i], true);
+                calPlots.addPoint(attenSteps[i], attenuation[i]);
             }
             Sleep(100);
-            for (int j=0; j<cfdZERO.size(); ++j) {
+            for (int j=0; j<cfdZERO.size(); j+= 1+coarse) {
                 for (int ch=0; ch<12; ++ch) {
                     adcRegs[4*ch+1] = cfdZERO[j];
                 }
@@ -694,34 +707,24 @@ public:
                 success = FEE.readCounters(counters);
                 FEE.readHistograms(hTime);
                 computeMeanTime(meanTime,stdTime,timeOK);
-                quint32 maxEntryTime = 0;
-                for (auto k=0; k<4096; ++k) {
-                    maxEntryTime = std::max(maxEntryTime, FEE.DCh[ch0].binValueTime(k));
-                }
-                maxEntryTime = (maxEntryTime ? 1 : 0);
-                for (auto k=0; k<4096; ++k) {
-                    auto const signedTime = (k>=2048 ? k-4096 : k);
-                    auto idx = 200 + signedTime;
-                    idx = (idx <   0 ?   0 : idx);
-                    idx = (idx > 400 ? 400 : idx);
-                    calPlots->getDataTime(i)->setCell(idx, j, maxEntryTime ? FEE.DCh[ch0].binValueTime(k)/ double(maxEntryTime) : 0.1);
-                    if (FEE.DCh[ch0].binValueTime(k) == 0) {
-                        calPlots->getDataTime(i)->setCell(idx, j, 0.1);
+                std::array<quint32,401> histLine;
+                for (int k=0; k<4096; ++k) {
+                    int const signedTime = (k>=2048 ? k-4096 : k);
+                    int idx = 200 + signedTime;
+                    if (idx < 0 || idx > 400) {
+                        continue;
                     }
+                    histLine[idx] = FEE.DCh[ch0].binValueTime(k);
+                }
+                calPlots.setHistogramLine(i, j, histLine);
+                if (coarse && j+1 != cfdZERO.size()) {
+                    calPlots.setHistogramLine(i, j+1, histLine);
                 }
 
                 for (int ch=0; ch<12; ++ch) {
                     times[ch][j][i] = {meanTime[ch], stdTime[ch], timeOK[ch],
                                        double(counters[2*ch]-countersOld[2*ch])/0.2,
                                        0.0, 0.0};
-#if 0
-                    p->insertPlainText(QString::asprintf(" %s  CH%02d %7.2f %7.2f %s  %s\n",
-                                                   formatPM().c_str(),
-                                                   ch, meanTime[ch], stdTime[ch],
-                                                   timeOK[ch] == 1 ? "OK   " : (timeOK[ch] == 0 ? "BAD  " : "EMPTY"),  times[ch][j][i].format().c_str()));
-#endif
-
-
                 }
                 QScrollBar *sb = p->verticalScrollBar();
                 sb->setValue(sb->maximum());
@@ -730,14 +733,16 @@ public:
             p->insertPlainText("\n");
         }
         p->insertPlainText("\n\n");
-        setAttenuator(attenStepsOrig);
+        setAttenuator(attenStepsOrig, true);
 
-        calPlots->rescaleDataRanges();
-        calPlots->rescaleAxes();
-        calPlots->setAxisRange(-50, 50, -500, 500);
-        calPlots->replot();
+        calPlots.rescaleDataRanges();
+        calPlots.rescaleAxes();
+        calPlots.setAxisRange(-50, 50, cfdZERO.front(), cfdZERO.back());
+        calPlots.replot();
+        double const width = 1200;
+        double const height = 600;
         QTextCursor cursor = ui->calTextOutput->textCursor();
-        cursor.insertText(QString(QChar::ObjectReplacementCharacter), QCPDocumentObject::generatePlotFormat(calPlots, width, height));
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), QCPDocumentObject::generatePlotFormat(&calPlots, width, height));
         ui->calTextOutput->setTextCursor(cursor);
 
         int newCFDValue = -10000; // set to invalid
@@ -749,7 +754,7 @@ public:
         float timeDifferenceLast = 100;
         bool haveSeenNegativeTimeDifference = false;
         int const refAttenIndex = (coarse ? 0 : 0);
-        for (int i=0; i<cfdZERO.size(); ++i) {
+        for (int i=0; i<cfdZERO.size(); i+= 1+coarse) {
             p->insertPlainText(QString::asprintf(" %s  CH%02d %6d ",
                                            formatPM().c_str(),
                                            ch0, cfdZERO[i]));
@@ -789,50 +794,77 @@ public:
         QScrollBar *sb = p->verticalScrollBar();
         sb->setValue(sb->maximum());
         return newCFDValue;
+#endif
+        return 0;
     }
     void on_buttonCalCFDThreshold_clicked() {
+#if 0
+        CalibrationPlots calPlots;
+        std::array<quint32,401> histLine;
+        for (auto k=0; k<401; ++k) {
+            histLine[k] = 10;
+        }
+        for (auto i=0; i<3; ++i) {
+            calPlots.setHistogramLine(i, 20, histLine);
+        }
+        QPlainTextEdit *p = ui->calTextOutput;
 
-        CalibrationParameterDialog dialog(ADCUperMIP, 7200, this);
-        dialog.adjustSize();
-        dialog.setModal(true);
+        QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
+        ui->calTextOutput->document()->documentLayout()->registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
 
-        if(dialog.exec() != QDialog::Accepted) {
+        double const width = 1200;
+        double const height = 600;
+
+        calPlots.rescaleDataRanges();
+        calPlots.rescaleAxes();
+        calPlots.setAxisRange(-50, 50, -500, 500);
+        calPlots.replot();
+        QTextCursor cursor = ui->calTextOutput->textCursor();
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), QCPDocumentObject::generatePlotFormat(&calPlots, width, height));
+        ui->calTextOutput->setTextCursor(cursor);
+
+        return;
+#else
+        _calibrationDialog->adjustSize();
+        //dialog.setModal(true);
+
+        if(_calibrationDialog->exec() != QDialog::Accepted) {
             return;
         }
-
+       // return;
         ui->tabWidget->setCurrentIndex(3);
         QPlainTextEdit *p = ui->calTextOutput;
         p->clear();
 
-        p->insertPlainText(QString::asprintf("START %g %d ", dialog.getADCPerMip(), dialog.getInitialSteps()));
+        p->insertPlainText(QString::asprintf("START %g %d ", _calibrationDialog->getADCPerMip(), _calibrationDialog->getInitialSteps()));
         for (int ch=0; ch<12; ++ch) {
-            p->insertPlainText(QString::asprintf("%d", dialog.isChannelSelected(ch)));
+            p->insertPlainText(QString::asprintf("%d", _calibrationDialog->isChannelSelected(ch)));
         }
         p->insertPlainText("\n");
 
         changeUnit(H[hAmpl], 1.); ui->buttonTune->setVisible(false);
 
-        for (int ch0=0; ch0<1; ++ch0) { // 12
-            if (!dialog.isChannelSelected(ch0)) {
+        for (int ch0=0; ch0<12; ++ch0) {
+            if (!_calibrationDialog->isChannelSelected(ch0)) {
                 continue;
             }
-            setAttenuator(dialog.getInitialSteps());
+            setAttenuator(_calibrationDialog->getInitialSteps(), true);
             std::array<quint32,3> attenSteps;
 
             p->insertPlainText(QString::asprintf("COARSE SCAN for CH=%02d\n================================\n\n", ch0+1));
-            int newCFDValue = calCFDThreshold(ch0, attenSteps, dialog.getADCPerMip(), true);
+            int newCFDValue = calCFDThreshold(ch0, attenSteps, _calibrationDialog->getADCPerMip(), true);
             if (newCFDValue == -10000) {
                 p->insertPlainText("COARSE SCAN has failed\n");
                 QScrollBar *sb = p->verticalScrollBar();
                 sb->setValue(sb->maximum());
                 return;
             }
-    return;
+
             p->insertPlainText(QString::asprintf("\n================================\nFINE  SCAN for CH=%02d starting at %5d\n================================\n\n", ch0+1, newCFDValue));
 
-            newCFDValue = calCFDThreshold(ch0, attenSteps, dialog.getADCPerMip(), false, newCFDValue);
+            newCFDValue = calCFDThreshold(ch0, attenSteps, _calibrationDialog->getADCPerMip(), false, newCFDValue);
             if (newCFDValue == -10000) {
-                setAttenuator(attenSteps[0]);
+                setAttenuator(attenSteps[0], true);
                 p->insertPlainText(QString::asprintf("FINE  SCAN for CH=%02d has failed\n", ch0+1));
                 QScrollBar *sb = p->verticalScrollBar();
                 sb->setValue(sb->maximum());
@@ -845,11 +877,12 @@ public:
                 adcRegs[4*ch0+1] = newCFDValue;
                 success = FEE.writeADCRegisters(adcRegs);
                 p->insertPlainText(success ? "\nOK\n" : "\nFAILED\n");
-                setAttenuator(attenSteps[0]);
+                setAttenuator(attenSteps[0], true);
                 QScrollBar *sb = p->verticalScrollBar();
                 sb->setValue(sb->maximum());
             }
         }
+#endif
     }
 
 public slots:

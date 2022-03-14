@@ -10,11 +10,12 @@ class CalibrationPlots: public QCustomPlot
 public:
     CalibrationPlots()
       : QCustomPlot()
-      , _graphAdcVsSteps()
       , _colorMapsTime()
       , _axisRects()
-      , _x()
-      , _y() {
+      , _x0()
+      , _y0()
+      , _x1()
+      ,_y1() {
         auto axr = axisRect();
         axr->axis(QCPAxis::atBottom)->setLabel("attenuator steps");
         axr->axis(QCPAxis::atLeft)->setLabel("ADC");
@@ -23,10 +24,17 @@ public:
         axr->axis(QCPAxis::atTop)->setLabel("ADC vs. attenuator steps");
         axr->axis(QCPAxis::atLeft)->setRange(5, 250);
         axr->axis(QCPAxis::atBottom)->setRange(3000, 8000);
-        _graphAdcVsSteps = this->addGraph(axr->axis(QCPAxis::atBottom),
+        this->addGraph(axr->axis(QCPAxis::atBottom),
                                           axr->axis(QCPAxis::atLeft));
-
+        this->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
+#if 1
+        this->addGraph(axr->axis(QCPAxis::atBottom),
+                                               axr->axis(QCPAxis::atLeft));
+        this->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, Qt::red, Qt::red, 5));
+        this->graph(1)->setLineStyle(QCPGraph::lsNone);
+#endif
         this->plotLayout()->insertRow(1);
+        this->plotLayout()->setRowStretchFactor(1,0.05);
         for (int i=0; i<3; ++i) {
             axr = new QCPAxisRect(this,true);
             axr->setupFullAxesBox(true);
@@ -51,12 +59,18 @@ public:
             this->plotLayout()->addElement(2,i,axr);
         }
         this->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        this->setMinimumHeight(400);
     }
     void clear() {
-        _x.clear();
-        _y.clear();
+        _x0.clear();
+        _y0.clear();
+        _x1.clear();
+        _y1.clear();
         for (int i=0; i<3; ++i) {
-            _colorMapsTime.at(i)->data()->clear();
+            auto cm = _colorMapsTime.at(i);
+            cm->data()->clear();
+            cm->data()->setSize(401, 41);
+            cm->data()->setRange(QCPRange(-200,200), QCPRange(-500, 500));
         }
     }
     void setAxisRange(double xMin, double xMax, double yMin, double yMax) {
@@ -77,22 +91,34 @@ public:
             _colorMapsTime.at(i)->rescaleDataRange(true);
         }
     }
-    QCPColorMapData* getDataTime(int i) { return _colorMapsTime.at(i)->data(); }
 
-    void addPoint(double x, double y) {
-        _x.push_back(x);
-        _y.push_back(y);
-        _graphAdcVsSteps->setData(_x, _y);
+    void addPoint(double x, double y, bool dots = false) {
+        if (dots) {
+            _x1.push_back(x);
+            _y1.push_back(y);
+            this->graph(1)->setData(_x1, _y1);
+        } else {
+            _x0.push_back(x);
+            _y0.push_back(y);
+            this->graph(0)->setData(_x0, _y0);
+        }
         this->replot();
+    }
+
+   void setHistogramLine(int i, int j, std::array<quint32, 401> x) {
+        for (auto k=0; k<401; ++k) {
+            _colorMapsTime.at(i)->data()->setCell(k, j, x[k]);
+        }
     }
 
 protected:
 private:
-    QCPGraph *_graphAdcVsSteps;
     QList<QCPColorMap* > _colorMapsTime;
     QList<QCPAxisRect* > _axisRects;
-    QVector<double> _x;
-    QVector<double> _y;
+    QVector<double> _x0;
+    QVector<double> _y0;
+    QVector<double> _x1;
+    QVector<double> _y1;
 };
 
 #endif // CALIBRATIONPLOTS_H

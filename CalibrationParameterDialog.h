@@ -11,6 +11,8 @@
 #include <QFormLayout>
 #include <QTextStream>
 
+#include "CalibrationPlots.h"
+
 class CalibrationParameterDialog : public QDialog
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ public:
       , _startStepsLineEdit()
       , _channelSelectCheckBoxes()
       , _buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Vertical, this)
+      , _calPlots(new CalibrationPlots)
     {
         _adcLineEdit.setText(QString::asprintf("%g",adcPerMip));
         _startStepsLineEdit.setText(QString::asprintf("%d", steps));
@@ -47,6 +50,7 @@ public:
         mainLayout->addLayout(formLayout,     1, 2, 2, 1);
         mainLayout->addItem  (spacer,         1, 3, 2, 1);
         mainLayout->addWidget(&_buttonBox,    1, 0, 2, 1);
+        //mainLayout->addWidget(_calPlots,      3, 0, 1, 4);
         mainLayout->setRowStretch(2, 1);
         setLayout(mainLayout);
 
@@ -67,13 +71,19 @@ public:
     bool isChannelSelected(int ch) const {
         return _channelSelectCheckBoxes.at(ch)->isChecked();
     }
+    CalibrationPlots* getCalPlots() {
+        return _calPlots;
+    }
 public slots:
+
+
 protected:
 private:
     QLineEdit _adcLineEdit;
     QLineEdit _startStepsLineEdit;
     QList<QCheckBox*> _channelSelectCheckBoxes;
     QDialogButtonBox _buttonBox;
+    CalibrationPlots* _calPlots;
 };
 
 #endif // CALIBRATIONPARAMETERDIALOG_H
