@@ -268,6 +268,12 @@ public slots:
         addTransaction(read, iBd*0x200+0xC0, data, 24);
         return transceive();
     }
+    quint32 readAtten() {
+        return readRegister(0x03);
+    }
+    void writeAtten(quint32 reg) {
+        writeRegister(0x03, reg);
+    }
 
 };
 
