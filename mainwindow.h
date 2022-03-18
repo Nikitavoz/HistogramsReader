@@ -245,7 +245,7 @@ public:
         updateBoardsList(0);
         on_tabWidget_currentChanged(0);
         FEE.reconnect();
-        _calibrationDialog = new CalibrationParameterDialog(ADCUperMIP, 7200, this);
+        _calibrationDialog = new CalibrationParameterDialog(FEE, ADCUperMIP, 7200, this);
     }
 
     ~MainWindow() {
@@ -826,11 +826,13 @@ public:
         return;
 #else
         _calibrationDialog->adjustSize();
-        //dialog.setModal(true);
+        //_calibrationDialog.setModal(true);
+        _calibrationDialog->setADCPerMip(ADCUperMIP);
 
         if(_calibrationDialog->exec() != QDialog::Accepted) {
             return;
         }
+#if 0
        // return;
         ui->tabWidget->setCurrentIndex(3);
         QPlainTextEdit *p = ui->calTextOutput;
@@ -882,6 +884,7 @@ public:
                 sb->setValue(sb->maximum());
             }
         }
+#endif
 #endif
     }
 
