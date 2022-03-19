@@ -1,5 +1,21 @@
 #include "CalibrationTasks.h"
 
+std::unique_ptr<FITelectronics> CalibrationTasks::makeAndSetupFEE()
+{
+    auto p = std::unique_ptr<FITelectronics>(new FITelectronics);
+    p->IPaddress = _ipAddress;
+    p->iBd       = _iBd;
+    p->reconnect();
+    if (p->isOnline == false) {
+        onIPBusError("Network ERROR: IP="+_ipAddress+"\n", networkError);
+        p.reset();
+        return p;
+    }
+    connect(p.get(), SIGNAL(error(QString,errorType)), this, SLOT(onIPBusError(QString,errorType)));
+    connect(p.get(), SIGNAL(noResponse(QString)),      this, SLOT(onIPBusNoResponse(QString)));
+    return p;
+}
+
 void CalibrationTasks::computeMeanStd(FITelectronics &_FEE,
                                      int typeHist,
                                      std::array<double,12>& mean,
@@ -149,6 +165,9 @@ bool CalibrationTasks::adjustAttenuatorADC(FITelectronics& FEE, int ch0, float r
     float lastAmpl = 0.0f;
     qint32 deltaAttenSteps = -50;
     for (; attenSteps > 1000; attenSteps += deltaAttenSteps) {
+        if (_abort) {
+            return false;
+        }
         setAttenuator(FEE, attenSteps);
         FEE.reset();
         Sleep(10);
@@ -203,8 +222,7 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
             cfdZERO[i] = startCFDOffset - 100 + 5*i;
         }
     }
-//TODO    calPlots.setAxisRange(-200, 200, cfdZERO.front(), cfdZERO.back());
-//TODO    calPlots.setTitles(attenuation);
+    emit setTitlesADC(ch0, attenuation);
 
     struct MeasurementValue {
         MeasurementValue(double tm=0, double tr=0, int ok=0, double r=0, double cm=0, double cr=0)
@@ -250,13 +268,17 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
         Sleep(100);
         emit logMessage(0, QString::asprintf("CFD_ZERO scan [%d,%d]: ", cfdZERO.front(), cfdZERO.back()));
         for (int j=0; j<cfdZERO.size(); j+= 1+coarse) {
+            if (_abort) {
+                FEE.writeADCRegisters(adcRegsOld);
+                emit logMessage(0, "ABORT\n");
+                return result;
+            }
             for (int ch=0; ch<12; ++ch) {
                 adcRegs[4*ch+1] = cfdZERO[j];
             }
             emit logMessage(0, ".");
             emit logMessage(1+ch0, QString::asprintf("%5d", cfdZERO[j]));
             FEE.reset();
-            //Sleep(10);
             success = FEE.writeADCRegisters(adcRegs);
             Sleep(20);
 

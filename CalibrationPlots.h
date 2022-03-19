@@ -36,6 +36,10 @@ public:
         this->plotLayout()->insertRow(1);
         this->plotLayout()->setRowStretchFactor(1,0.05);
         for (int i=0; i<3; ++i) {
+            // title
+            this->plotLayout()->addElement(1, i, new QCPTextElement(this, "", QFont("sans", 12, QFont::Bold)));
+
+            // 2D histogram
             axr = new QCPAxisRect(this,true);
             axr->setupFullAxesBox(true);
             _axisRects.append(axr);
@@ -64,17 +68,22 @@ public:
     void clear() {
         _x0.clear();
         _y0.clear();
+        this->graph(0)->setData(_x0, _y0);
+
         _x1.clear();
         _y1.clear();
+        this->graph(1)->setData(_x1, _y1);
+
         for (int i=0; i<3; ++i) {
             auto cm = _colorMapsTime.at(i);
             cm->data()->clear();
             cm->data()->setSize(401, 41);
             cm->data()->setRange(QCPRange(-200,200), QCPRange(-500, 500));
+            qobject_cast<QCPTextElement*>(this->plotLayout()->element(1,i))->setText("");
         }
         setAxisRange(-50, 50, -500, 500);
         rescaleDataRanges();
-        rescaleAxes();
+        //rescaleAxes();
     }
     void setAxisRange(double xMin, double xMax, double yMin, double yMax) {
         for (int i=0; i<3; ++i) {
@@ -86,7 +95,9 @@ public:
     }
     void setTitles(const std::array<double, 3>& adcs) {
         for (int i=0; i<3; ++i) {
-            this->plotLayout()->addElement(1, i, new QCPTextElement(this, QString::asprintf("%.0fADC", adcs[i]), QFont("sans", 12, QFont::Bold)));
+            auto p = qobject_cast<QCPTextElement*>(this->plotLayout()->element(1,i));
+            p->setText(QString::asprintf("%.0fADC", adcs[i]));
+            //this->plotLayout()->addElement(1, i, new QCPTextElement(this, QString::asprintf("%.0fADC", adcs[i]), QFont("sans", 12, QFont::Bold)));
         }
     }
     void rescaleDataRanges() {
@@ -105,18 +116,12 @@ public:
             _y0.push_back(y);
             this->graph(0)->setData(_x0, _y0);
         }
-        replot();
     }
 
    void setHistogramLine(int i, int j, QVector<quint32> x) {
         for (auto k=0; k<401; ++k) {
             _colorMapsTime.at(i)->data()->setCell(k, j, x[k]);
         }
-#if 0
-        rescaleDataRanges();
-        //rescaleAxes();
-        replot();
-#endif
    }
 
 protected:

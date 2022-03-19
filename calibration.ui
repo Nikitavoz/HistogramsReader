@@ -316,7 +316,7 @@
     <rect>
      <x>20</x>
      <y>70</y>
-     <width>671</width>
+     <width>611</width>
      <height>51</height>
     </rect>
    </property>
@@ -521,22 +521,6 @@
      <string>CH12</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="statusCHALL">
-    <property name="geometry">
-     <rect>
-      <x>630</x>
-      <y>20</y>
-      <width>51</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QCheckBox::indicator {background-color:red;}</string>
-    </property>
-    <property name="text">
-     <string>ALL</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QGroupBox" name="groupCommands">
    <property name="geometry">
@@ -556,7 +540,7 @@
       <x>10</x>
       <y>20</y>
       <width>91</width>
-      <height>71</height>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -582,7 +566,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Stop</string>
+        <string>Abort</string>
        </property>
       </widget>
      </item>
@@ -759,6 +743,22 @@
      <string>CH12</string>
     </attribute>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="pushButtonRestoreTimeDelays">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>150</y>
+     <width>111</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Restore TimeDelays</string>
+   </property>
   </widget>
  </widget>
  <resources/>

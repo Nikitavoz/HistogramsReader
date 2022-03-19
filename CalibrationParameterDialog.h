@@ -30,6 +30,8 @@ public:
       , _calPlots()
       , _colorStyles()
       , _calibrationTasks(new CalibrationTasks(ipAddress))
+      , _timeAlignmentDone(false)
+      , _lastiBd(-1)
     {
         _ui->setupUi(this);
 
@@ -86,20 +88,23 @@ public:
         connect(_ui->pushButtonClose, &QPushButton::clicked, this, &QDialog::reject);
         connect(_ui->pushButtonStart, &QPushButton::clicked, this, &CalibrationParameterDialog::onStartCalibration);
         connect(_ui->pushButtonAbort, &QPushButton::clicked, this, &CalibrationParameterDialog::onAbortCalibration);
+        connect(_ui->pushButtonRestoreTimeDelays, &QPushButton::clicked, _calibrationTasks.get(), &CalibrationTasks::onRestoreTimeDelays);
 
         _ui->groupParametersCFD_ZERO->setVisible(false);
+        hideRestoreTimeDelays();
 
         // connections
-        connect(_ui->radioButtonTimeAlign, &QRadioButton::clicked, this, [=]() {_ui->groupParametersCFD_ZERO->setVisible(false); });
-        connect(_ui->radioButtonADC_DELAY, &QRadioButton::clicked, this, [=]() {_ui->groupParametersCFD_ZERO->setVisible(false); });
-        connect(_ui->radioButtonCFD_ZERO,  &QRadioButton::clicked, this, [=]() {_ui->groupParametersCFD_ZERO->setVisible(true);  });
+        connect(_ui->radioButtonTimeAlign, &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(false); });
+        connect(_ui->radioButtonADC_DELAY, &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(false); });
+        connect(_ui->radioButtonCFD_ZERO,  &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(true);  });
 
-        connect(_calibrationTasks, SIGNAL(finished()),              this, SLOT(onCalibrationFinished()),            Qt::QueuedConnection);
-        connect(_calibrationTasks, SIGNAL(updateStatus(int,int)),   this, SLOT(onCalibrationStatusUpdate(int,int)), Qt::QueuedConnection);
-        connect(_calibrationTasks, SIGNAL(logMessage(int,QString)), this, SLOT(onLogMessage(int,QString)),          Qt::QueuedConnection);
-        connect(_calibrationTasks, SIGNAL(addPointADCvSteps(int,float,float,bool)), this, SLOT(onAddPointADCvSteps(int,float,float,bool)), Qt::QueuedConnection);
-        connect(_calibrationTasks, SIGNAL(clearCalPlots(int)),      this, SLOT(onClearCalPlots(int)),               Qt::QueuedConnection);
-        connect(_calibrationTasks, SIGNAL(addHistLine(int,int,int,QVector<quint32>)), this, SLOT(onAddHistLine(int,int,int,QVector<quint32>)), Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(finished()),              this, SLOT(onCalibrationFinished()),            Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(updateStatus(int,int)),   this, SLOT(onCalibrationStatusUpdate(int,int)), Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(logMessage(int,QString)), this, SLOT(onLogMessage(int,QString)),          Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(addPointADCvSteps(int,float,float,bool)), this, SLOT(onAddPointADCvSteps(int,float,float,bool)), Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(clearCalPlots(int)),      this, SLOT(onClearCalPlots(int)),               Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(addHistLine(int,int,int,QVector<quint32>)), this, SLOT(onAddHistLine(int,int,int,QVector<quint32>)), Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(setTitlesADC(int, std::array<double,3>)), this, SLOT(onSetTitlesADC(int, std::array<double,3>)), Qt::QueuedConnection);
 
         // default parameters
         _ui->lineEditADCpMIP->setText(QString::asprintf("%g",adcPerMip));
@@ -126,18 +131,35 @@ public:
     bool isChannelSelected(int ch) const {
         return _channelSelect.at(ch)->isChecked();
     }
-#if 0
-    CalibrationPlots* getCalPlots() {
-        return _calPlots;
+    void hideRestoreTimeDelays() {
+        _timeAlignmentDone = false;
+        _ui->pushButtonRestoreTimeDelays->setVisible(false);
     }
-#endif
-    ~CalibrationParameterDialog() {
-        delete _ui;
-        delete _calibrationTasks;
-    }
-    void setIPAddress(QString ip) { _calibrationTasks->setIPAddress(ip);}
-    void setiBd(int i) { _calibrationTasks->setiBd(i); }
 
+    void setIPAddress(QString ip) {
+        _calibrationTasks->setIPAddress(ip);
+    }
+    void setiBd(int iBd, QString pmName) {
+        if (_lastiBd != iBd) {
+            _lastiBd = iBd;
+            reset();
+        }
+        _calibrationTasks->setiBd(iBd);
+        _ui->groupChannelSelect->setTitle("Channel Selection - (PM" + pmName + ")");
+        setWindowTitle("PM Calibration");
+    }
+    void reset() {
+        for (int ch=0; ch<13; ++ch) { // ch==12 ... ALL
+            _channelSelect.at(ch)->setChecked(true);
+            _calLogs.at(ch)->clear();
+            if (ch != 12) {
+                _calPlots.at(ch)->clear();
+                _channelStatus.at(ch)->setStyleSheet(_colorStyles.at(1));
+            }
+        }
+        _ui->radioButtonTimeAlign->setChecked(true);
+        _ui->groupChannelStatus->setTitle("Calibration Status");
+    }
 public slots:
 
 protected:
@@ -160,10 +182,14 @@ private slots:
             _channelStatus.at(ch)->setStyleSheet(_colorStyles.at(value));
         }
     }
-    void onStartCalibration() {
+    void onStartCalibration(bool) {
         _ui->pushButtonStart->setDisabled(true);
         _ui->pushButtonAbort->setEnabled(true);
         _ui->pushButtonClose->setDisabled(true);
+        _ui->groupCalibrationTypes->setDisabled(true);
+        _ui->groupChannelSelect->setDisabled(true);
+        _ui->groupParametersCFD_ZERO->setDisabled(true);
+        _ui->pushButtonRestoreTimeDelays->setDisabled(true);
         foreach(auto c, _calLogs) {
             c->clear();
         }
@@ -174,27 +200,43 @@ private slots:
         _calibrationTasks->setActiveChannelMap(activeChannelMap);
         if (_ui->radioButtonTimeAlign->isChecked()) {
             _calibrationTasks->setMode("TimeAlign");
+            _ui->groupChannelStatus->setTitle("Calibration Status - Time Alignment");
         }
         if (_ui->radioButtonADC_DELAY->isChecked()) {
             _calibrationTasks->setMode("ADC_DELAY");
+            _ui->groupChannelStatus->setTitle("Calibration Status - ADC_DELAY");
         }
         if (_ui->radioButtonCFD_ZERO->isChecked()) {
             _calibrationTasks->setMode("CFD_ZERO");
+            _ui->groupChannelStatus->setTitle("Calibration Status - CFD_ZERO");
             _calibrationTasks->setADCpMIP(getADCPerMip());
             _calibrationTasks->setInitialSteps(getInitialSteps());
         }
-        QThreadPool::globalInstance()->start(_calibrationTasks);
+        QThreadPool::globalInstance()->start(_calibrationTasks.get());
     }
-    void onAbortCalibration() {
+    void onAbortCalibration(bool) {
         _calibrationTasks->setAbort();
         _ui->pushButtonStart->setEnabled(true);
         _ui->pushButtonAbort->setDisabled(true);
         _ui->pushButtonClose->setEnabled(true);
+        _ui->groupCalibrationTypes->setEnabled(true);
+        _ui->groupChannelSelect->setEnabled(true);
+        _ui->groupParametersCFD_ZERO->setEnabled(true);
+        _ui->pushButtonRestoreTimeDelays->setVisible(_timeAlignmentDone);
+        _ui->pushButtonRestoreTimeDelays->setEnabled(true);
     }
     void onCalibrationFinished() {
         _ui->pushButtonStart->setEnabled(true);
         _ui->pushButtonAbort->setDisabled(true);
         _ui->pushButtonClose->setEnabled(true);
+        _ui->groupCalibrationTypes->setEnabled(true);
+        _ui->groupChannelSelect->setEnabled(true);
+        _ui->groupParametersCFD_ZERO->setEnabled(true);
+        if (_ui->radioButtonTimeAlign->isChecked()) {
+            _timeAlignmentDone = true;
+        }
+        _ui->pushButtonRestoreTimeDelays->setVisible(_timeAlignmentDone);
+        _ui->pushButtonRestoreTimeDelays->setEnabled(true);
     }
     void onCalibrationStatusUpdate(int ch, int status) {
         _channelStatus.at(ch)->setStyleSheet(_colorStyles.at(status));
@@ -210,6 +252,7 @@ private slots:
     }
     void onAddPointADCvSteps(int ch, float x, float y, bool dots) {
         _calPlots.at(ch)->addPoint(x, y, dots);
+        _calPlots.at(ch)->replot();
     }
     void onClearCalPlots(int ch) {
         _calPlots.at(ch)->clear();
@@ -218,21 +261,22 @@ private slots:
         _calPlots.at(ch)->setHistogramLine(i, j, x);
         _calPlots.at(ch)->setAxisRange(-50, 50, -500, 500);
         _calPlots.at(ch)->rescaleDataRanges();
-        //rescaleAxes();
         _calPlots.at(ch)->replot();
+    }
+    void onSetTitlesADC(int ch, std::array<double,3> adcs) {
+        _calPlots.at(ch)->setTitles(adcs);
     }
 
  private:
-    Ui::CalibrationWindow *_ui;
-#if 0
-    CalibrationPlots* _calPlots;
-#endif
+    std::unique_ptr<Ui::CalibrationWindow> _ui;
     QList<QCheckBox*> _channelSelect;
     QList<QCheckBox*> _channelStatus;
     QList<QPlainTextEdit*> _calLogs;
     QList<CalibrationPlots*> _calPlots;
     QStringList       _colorStyles;
-    CalibrationTasks* _calibrationTasks;
+    std::unique_ptr<CalibrationTasks> _calibrationTasks;
+    bool _timeAlignmentDone;
+    int _lastiBd;
 };
 
 #endif // CALIBRATIONPARAMETERDIALOG_H
