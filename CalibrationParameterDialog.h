@@ -13,23 +13,23 @@
 
 #include "FITelectronics.h"
 #include "CalibrationTasks.h"
+#include "CalibrationPlots.h"
 
 #include "ui_calibration.h"
-
-#include "CalibrationPlots.h"
 
 class CalibrationParameterDialog : public QDialog
 {
     Q_OBJECT
 public:
-    CalibrationParameterDialog(FITelectronics& fee, float adcPerMip=16.0f, quint32 steps=7500, QWidget *parent = nullptr)
+    CalibrationParameterDialog(QString ipAddress, float adcPerMip=16.0f, quint32 steps=7500, QWidget *parent = nullptr)
       : QDialog(parent)
       , _ui(new Ui::CalibrationWindow)
       , _channelSelect()
       , _channelStatus()
       , _calLogs()
+      , _calPlots()
       , _colorStyles()
-      , _calibrationTasks(new CalibrationTasks(fee))
+      , _calibrationTasks(new CalibrationTasks(ipAddress))
     {
         _ui->setupUi(this);
 
@@ -50,6 +50,24 @@ public:
         foreach (QWidget* w, _ui->groupChannelStatus->findChildren<QWidget *>(QRegularExpression("statusCH*"))) {
             _channelStatus.append(qobject_cast<QCheckBox*>(w));
             _channelStatus.back()->setStyleSheet(_colorStyles.at(1));
+        }
+
+        // set up log tabs for each channel
+        for (int ch=0; ch<12; ++ch) {
+             QVBoxLayout *layout = new QVBoxLayout;
+             _calPlots.append(new CalibrationPlots());
+             _calPlots.back()->setObjectName(QString::asprintf("calPlotsCH%02d",1+ch));
+             _calPlots.back()->clear();
+             layout->addWidget(_calPlots.back());
+             QPlainTextEdit* pte = new QPlainTextEdit();
+             pte->setObjectName(QString::asprintf("plainTextEditCH%02d", 1+ch));
+             pte->setReadOnly(true);
+             pte->setUndoRedoEnabled(false);
+             //pte->setMouseTracking(false);
+             pte->setTextInteractionFlags(Qt::NoTextInteraction);
+             layout->addWidget(pte);
+            _ui->tabWidget->setCurrentIndex(1+ch);
+            _ui->tabWidget->currentWidget()->setLayout(layout);
         }
 
         // log tabs
@@ -76,9 +94,12 @@ public:
         connect(_ui->radioButtonADC_DELAY, &QRadioButton::clicked, this, [=]() {_ui->groupParametersCFD_ZERO->setVisible(false); });
         connect(_ui->radioButtonCFD_ZERO,  &QRadioButton::clicked, this, [=]() {_ui->groupParametersCFD_ZERO->setVisible(true);  });
 
-        connect(_calibrationTasks, SIGNAL(finished),                this, SLOT(onCalibrationFinished),              Qt::QueuedConnection);
+        connect(_calibrationTasks, SIGNAL(finished()),              this, SLOT(onCalibrationFinished()),            Qt::QueuedConnection);
         connect(_calibrationTasks, SIGNAL(updateStatus(int,int)),   this, SLOT(onCalibrationStatusUpdate(int,int)), Qt::QueuedConnection);
         connect(_calibrationTasks, SIGNAL(logMessage(int,QString)), this, SLOT(onLogMessage(int,QString)),          Qt::QueuedConnection);
+        connect(_calibrationTasks, SIGNAL(addPointADCvSteps(int,float,float,bool)), this, SLOT(onAddPointADCvSteps(int,float,float,bool)), Qt::QueuedConnection);
+        connect(_calibrationTasks, SIGNAL(clearCalPlots(int)),      this, SLOT(onClearCalPlots(int)),               Qt::QueuedConnection);
+        connect(_calibrationTasks, SIGNAL(addHistLine(int,int,int,QVector<quint32>)), this, SLOT(onAddHistLine(int,int,int,QVector<quint32>)), Qt::QueuedConnection);
 
         // default parameters
         _ui->lineEditADCpMIP->setText(QString::asprintf("%g",adcPerMip));
@@ -114,6 +135,8 @@ public:
         delete _ui;
         delete _calibrationTasks;
     }
+    void setIPAddress(QString ip) { _calibrationTasks->setIPAddress(ip);}
+    void setiBd(int i) { _calibrationTasks->setiBd(i); }
 
 public slots:
 
@@ -175,11 +198,28 @@ private slots:
     }
     void onCalibrationStatusUpdate(int ch, int status) {
         _channelStatus.at(ch)->setStyleSheet(_colorStyles.at(status));
+        if (status == 0) {
+            _channelSelect.at(ch)->setChecked(false);
+            _channelSelect.at(12)->setChecked(false); // ALL
+        }
     }
     void onLogMessage(int tabIndex, QString msg) {
         _calLogs.at(tabIndex)->insertPlainText(msg);
         QScrollBar *sb = _calLogs.at(tabIndex)->verticalScrollBar();
         sb->setValue(sb->maximum());
+    }
+    void onAddPointADCvSteps(int ch, float x, float y, bool dots) {
+        _calPlots.at(ch)->addPoint(x, y, dots);
+    }
+    void onClearCalPlots(int ch) {
+        _calPlots.at(ch)->clear();
+    }
+    void onAddHistLine(int ch, int i, int j, QVector<quint32> x) {
+        _calPlots.at(ch)->setHistogramLine(i, j, x);
+        _calPlots.at(ch)->setAxisRange(-50, 50, -500, 500);
+        _calPlots.at(ch)->rescaleDataRanges();
+        //rescaleAxes();
+        _calPlots.at(ch)->replot();
     }
 
  private:
@@ -190,6 +230,7 @@ private slots:
     QList<QCheckBox*> _channelSelect;
     QList<QCheckBox*> _channelStatus;
     QList<QPlainTextEdit*> _calLogs;
+    QList<CalibrationPlots*> _calPlots;
     QStringList       _colorStyles;
     CalibrationTasks* _calibrationTasks;
 };

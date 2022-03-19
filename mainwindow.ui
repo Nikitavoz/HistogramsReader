@@ -702,7 +702,7 @@
       <property name="title">
        <string/>
       </property>
-      <widget class="Switch" name="switchHistorgammingPM">
+      <widget class="Switch" name="switchHistorgammingPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -711,10 +711,10 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="text">
+       <property name="text" stdset="0">
         <string/>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -744,7 +744,7 @@
         <string>BC filter</string>
        </property>
       </widget>
-      <widget class="Switch" name="switchFilterPM">
+      <widget class="Switch" name="switchFilterPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -753,7 +753,7 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -1322,45 +1322,17 @@
         </property>
        </widget>
       </widget>
-      <widget class="QComboBox" name="comboBoxCalibrationPM">
+      <widget class="QPushButton" name="pushButtonCalibrationPM">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>191</y>
-         <width>96</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <item>
-        <property name="text">
-         <string>Time Alignment</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ADC_DELAY</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>CFD_ZERO</string>
-        </property>
-       </item>
-      </widget>
-      <widget class="QLabel" name="labelCalibrationPM">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>175</y>
-         <width>96</width>
-         <height>13</height>
+         <x>3</x>
+         <y>174</y>
+         <width>94</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>Calibration</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        <string>CALIBRATION</string>
        </property>
       </widget>
      </widget>

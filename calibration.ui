@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>950</width>
-    <height>650</height>
+    <width>949</width>
+    <height>860</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -666,11 +666,11 @@
      <x>20</x>
      <y>240</y>
      <width>911</width>
-     <height>401</height>
+     <height>601</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>12</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tabALL">
     <attribute name="title">
@@ -682,7 +682,7 @@
        <x>0</x>
        <y>0</y>
        <width>911</width>
-       <height>381</height>
+       <height>581</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -703,253 +703,61 @@
     <attribute name="title">
      <string>CH01</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH01">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH02">
     <attribute name="title">
      <string>CH02</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH02">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH03">
     <attribute name="title">
      <string>CH03</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH03">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH04">
     <attribute name="title">
      <string>CH04</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH04">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH05">
     <attribute name="title">
      <string>CH05</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH05">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH06">
     <attribute name="title">
      <string>CH06</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH06">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH07">
     <attribute name="title">
      <string>CH07</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH07">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH08">
     <attribute name="title">
      <string>CH08</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH08">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH09">
     <attribute name="title">
      <string>CH09</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH09">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH10">
     <attribute name="title">
      <string>CH10</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH10">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH11">
     <attribute name="title">
      <string>CH11</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH11">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tabCH12">
     <attribute name="title">
      <string>CH12</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditCH12">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>381</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
    </widget>
   </widget>
  </widget>

@@ -22,14 +22,14 @@ public:
         axr->axis(QCPAxis::atLeft)->setScaleType(QCPAxis::stLogarithmic);
 
         axr->axis(QCPAxis::atTop)->setLabel("ADC vs. attenuator steps");
-        axr->axis(QCPAxis::atLeft)->setRange(5, 250);
-        axr->axis(QCPAxis::atBottom)->setRange(3000, 8000);
+        axr->axis(QCPAxis::atLeft)->setRange(10, 200);
+        axr->axis(QCPAxis::atBottom)->setRange(5000, 7400);
         this->addGraph(axr->axis(QCPAxis::atBottom),
-                                          axr->axis(QCPAxis::atLeft));
+                       axr->axis(QCPAxis::atLeft));
         this->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
 #if 1
         this->addGraph(axr->axis(QCPAxis::atBottom),
-                                               axr->axis(QCPAxis::atLeft));
+                       axr->axis(QCPAxis::atLeft));
         this->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, Qt::red, Qt::red, 5));
         this->graph(1)->setLineStyle(QCPGraph::lsNone);
 #endif
@@ -72,6 +72,9 @@ public:
             cm->data()->setSize(401, 41);
             cm->data()->setRange(QCPRange(-200,200), QCPRange(-500, 500));
         }
+        setAxisRange(-50, 50, -500, 500);
+        rescaleDataRanges();
+        rescaleAxes();
     }
     void setAxisRange(double xMin, double xMax, double yMin, double yMax) {
         for (int i=0; i<3; ++i) {
@@ -102,14 +105,19 @@ public:
             _y0.push_back(y);
             this->graph(0)->setData(_x0, _y0);
         }
-        this->replot();
+        replot();
     }
 
-   void setHistogramLine(int i, int j, std::array<quint32, 401> x) {
+   void setHistogramLine(int i, int j, QVector<quint32> x) {
         for (auto k=0; k<401; ++k) {
             _colorMapsTime.at(i)->data()->setCell(k, j, x[k]);
         }
-    }
+#if 0
+        rescaleDataRanges();
+        //rescaleAxes();
+        replot();
+#endif
+   }
 
 protected:
 private:
