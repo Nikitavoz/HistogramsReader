@@ -59,6 +59,7 @@ signals:
     void clearCalPlots(int ch);
     void addHistLine(int ch, int i, int j, QVector<quint32> x);
     void setTitlesADC(int ch, std::array<double,3> adcs);
+    void initialStepValue(int ch, int steps);
 
 public slots:
     void onRestoreTimeDelays() {
@@ -289,6 +290,7 @@ protected:
             }
             emit updateStatus(ch, 2);
             emit clearCalPlots(ch);
+            emit initialStepValue(ch, _initialSteps);
             setAttenuator(FEE, _initialSteps, true);
             std::array<quint32,3> attenSteps;
             emit logMessage(0, QString::asprintf("\n======================\nCOARSE SCAN for CH=%02d\n======================\n\n", ch+1));
@@ -343,7 +345,7 @@ private:
                         std::array<int,12>& timeOK,
                         std::array<int,12>& nEntries);
     bool setAttenuator(FITelectronics& FEE, quint32 steps, bool verbose = false);
-    bool adjustAttenuatorADC(FITelectronics& FEE, int ch, float refADCValue, quint32& attenSteps);
+    bool adjustAttenuatorADC(FITelectronics& FEE, int ch, float refADCValue, quint32& attenSteps, bool isFirst);
     std::pair<int,bool> calCFDThreshold(FITelectronics& FEE, int ch0, std::array<quint32,3>& attenSteps, float adcPerMIP, bool coarse=true, int startCFDOffset=0);
     std::unique_ptr<FITelectronics> makeAndSetupFEE();
 

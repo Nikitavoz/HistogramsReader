@@ -105,6 +105,7 @@ public:
         connect(_calibrationTasks.get(), SIGNAL(clearCalPlots(int)),      this, SLOT(onClearCalPlots(int)),               Qt::QueuedConnection);
         connect(_calibrationTasks.get(), SIGNAL(addHistLine(int,int,int,QVector<quint32>)), this, SLOT(onAddHistLine(int,int,int,QVector<quint32>)), Qt::QueuedConnection);
         connect(_calibrationTasks.get(), SIGNAL(setTitlesADC(int, std::array<double,3>)), this, SLOT(onSetTitlesADC(int, std::array<double,3>)), Qt::QueuedConnection);
+        connect(_calibrationTasks.get(), SIGNAL(initialStepValue(int,int)), this, SLOT(onInitialStepValue(int,int)), Qt::QueuedConnection);
 
         // default parameters
         _ui->lineEditADCpMIP->setText(QString::asprintf("%g",adcPerMip));
@@ -266,7 +267,9 @@ private slots:
     void onSetTitlesADC(int ch, std::array<double,3> adcs) {
         _calPlots.at(ch)->setTitles(adcs);
     }
-
+    void onInitialStepValue(int ch, int steps) {
+        _calPlots.at(ch)->setInitialSteps(steps);
+    }
  private:
     std::unique_ptr<Ui::CalibrationWindow> _ui;
     QList<QCheckBox*> _channelSelect;

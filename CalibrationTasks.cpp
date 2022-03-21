@@ -156,10 +156,10 @@ bool CalibrationTasks::setAttenuator(FITelectronics& FEE, quint32 steps, bool ve
 #endif
 }
 
-bool CalibrationTasks::adjustAttenuatorADC(FITelectronics& FEE, int ch0, float refADCValue, quint32& attenSteps)
+bool CalibrationTasks::adjustAttenuatorADC(FITelectronics& FEE, int ch0, float refADCValue, quint32& attenSteps, bool isFirst)
 {
     emit logMessage(0, QString::asprintf("adjustAttenuatorADC CH%02d refADCValue=%5.1f attenSteps=%d\n", ch0+1, refADCValue, attenSteps));
-    if (attenSteps == 0) {
+    if (attenSteps < 2000 || attenSteps > 12000) {
         return false;
     }
     float lastAmpl = 0.0f;
@@ -182,6 +182,11 @@ bool CalibrationTasks::adjustAttenuatorADC(FITelectronics& FEE, int ch0, float r
         emit addPointADCvSteps(ch0, attenSteps, meanAmpl[ch0], false); //calPlots.addPoint(attenSteps, charge);
 
         if (meanAmpl[ch0] > refADCValue && lastAmpl > 0) {
+            if (isFirst && lastAmpl > refADCValue) { // initial step value was set too low
+                emit logMessage(0, QString::asprintf("inital step value was set too low. Aborting...\n"));
+                _abort = true;
+                return false;
+            }
             // linear interpolation
             float const slope = float(deltaAttenSteps) / (meanAmpl[ch0] - lastAmpl); // steps/ADC
             int const attenStepsI = std::lround(float(attenSteps) - float(deltaAttenSteps) + slope * (refADCValue - lastAmpl));
@@ -254,7 +259,7 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
 
     for (int i=0; i<attenuation.size(); ++i) {
         if (coarse) {
-            if (!adjustAttenuatorADC(FEE, ch0, attenuation[i], steps)) {
+            if (!adjustAttenuatorADC(FEE, ch0, attenuation[i], steps, i==0)) {
                 result.second = false;
                 return result;
             }
