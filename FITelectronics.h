@@ -189,6 +189,9 @@ public:
         return max;
     }
 
+    std::string formatPM() const {
+        return QString::asprintf("%c%d", iBd>=11 ? 'C' : 'A', iBd - 10*(iBd>=11) - 1).toStdString();
+    }
 signals:
     void SPIlinksStatusUpdated(quint32);
     void statusReady();

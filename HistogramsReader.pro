@@ -9,12 +9,14 @@ CONFIG += c++latest
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    CalibrationTasks.cpp \
         qcustomplot.cpp qcpdocumentobject.cpp \
     main.cpp
 
 HEADERS += \
         CalibrationParameterDialog.h qcpdocumentobject.h \
     CalibrationPlots.h \
+    CalibrationTasks.h \
 	qcustomplot.h \
 	mainwindow.h \
 	IPbusHeaders.h \
@@ -23,6 +25,7 @@ HEADERS += \
 	switch.h
 
 FORMS += \
+    calibration.ui \
     mainwindow.ui
 
 RESOURCES += \
