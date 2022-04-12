@@ -164,6 +164,14 @@ public:
 public slots:
 
 protected:
+    void resizeEvent(QResizeEvent *event)
+    {
+        QWidget::resizeEvent(event);
+        auto const newHeight = std::max(minimumHeight(), event->size().height());
+        auto const newWidth = std::max(minimumWidth(), event->size().width());
+        _ui->tabWidget->resize(newWidth - 38,
+                               newHeight - 249);
+    }
 
 private slots:
     void onChannelSelect(int value) {

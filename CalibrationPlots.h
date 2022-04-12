@@ -49,8 +49,8 @@ public:
             //axr->setRangeZoom(Qt::Horizontal);
             //axr->setRangeDrag(Qt::Horizontal);
             axr->axis(QCPAxis::atBottom)->setLabel("time (TDC units)");
-            axr->axis(QCPAxis::atLeft)->setLabel("ADC_ZERO");
-            axr->axis(QCPAxis::atTop)->setLabel("ADC_ZERO vs. time");
+            axr->axis(QCPAxis::atLeft)->setLabel("CFD_ZERO");
+            axr->axis(QCPAxis::atTop)->setLabel("CFD_ZERO vs. time");
 
             //axr->axis(QCPAxis::atBottom)->setRange(-40, 40);
             QCPColorMap *colorMapTime = new QCPColorMap(axr->axis(QCPAxis::atBottom),
@@ -100,6 +100,7 @@ public:
             p->setText(QString::asprintf("%.0fADC", adcs[i]));
             //this->plotLayout()->addElement(1, i, new QCPTextElement(this, QString::asprintf("%.0fADC", adcs[i]), QFont("sans", 12, QFont::Bold)));
         }
+        _axisRects.at(0)->axis(QCPAxis::atLeft)->setRange(0.8*adcs.front(), 1.2*adcs.back());
     }
     void rescaleDataRanges() {
         for (auto i=0; i<3; ++i) {

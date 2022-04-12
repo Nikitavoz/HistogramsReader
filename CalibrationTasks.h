@@ -88,6 +88,13 @@ protected:
         if (_abort || !p) {
             return;
         }
+        for (auto ch=0; ch<12; ++ch) {
+            if (!_activeChannelMap[ch]) {
+                emit updateStatus(ch, 0);
+                continue;
+            }
+            emit updateStatus(ch, 1);
+        }
         auto& FEE = *p;
         for (auto ch=0; ch<12; ++ch) {
             if (!_activeChannelMap[ch]) {
@@ -170,16 +177,23 @@ protected:
         if (_abort || !p) {
             return;
         }
+        for (auto ch=0; ch<12; ++ch) {
+            if (!_activeChannelMap[ch]) {
+                emit updateStatus(ch, 0);
+                continue;
+            }
+            emit updateStatus(ch, 1);
+        }
         auto& FEE = *p;
+        emit logMessage(0, "FEE RESET\n");
+        FEE.reset();
+        Sleep(10);
         for (auto ch=0; ch<12; ++ch) {
             if (!_activeChannelMap[ch]) {
                 continue;
             }
             emit updateStatus(ch, 2);
         }
-        emit logMessage(0, "FEE RESET\n");
-        FEE.reset();
-        Sleep(10);
 
         quint32 adcRegs[4*12];
         bool  success = FEE.readADCRegisters(adcRegs);
@@ -282,6 +296,13 @@ protected:
         auto p = makeAndSetupFEE();
         if (_abort || !p) {
             return;
+        }
+        for (auto ch=0; ch<12; ++ch) {
+            if (!_activeChannelMap[ch]) {
+                emit updateStatus(ch, 0);
+                continue;
+            }
+            emit updateStatus(ch, 1);
         }
         auto& FEE = *p;
         for (int ch=0; ch<12; ++ch) {
