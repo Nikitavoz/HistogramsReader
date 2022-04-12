@@ -88,13 +88,6 @@ protected:
         if (_abort || !p) {
             return;
         }
-        for (auto ch=0; ch<12; ++ch) {
-            if (!_activeChannelMap[ch]) {
-                emit updateStatus(ch, 0);
-                continue;
-            }
-            emit updateStatus(ch, 1);
-        }
         auto& FEE = *p;
         for (auto ch=0; ch<12; ++ch) {
             if (!_activeChannelMap[ch]) {
@@ -176,13 +169,6 @@ protected:
         auto p = makeAndSetupFEE();
         if (_abort || !p) {
             return;
-        }
-        for (auto ch=0; ch<12; ++ch) {
-            if (!_activeChannelMap[ch]) {
-                emit updateStatus(ch, 0);
-                continue;
-            }
-            emit updateStatus(ch, 1);
         }
         auto& FEE = *p;
         emit logMessage(0, "FEE RESET\n");
@@ -296,13 +282,6 @@ protected:
         auto p = makeAndSetupFEE();
         if (_abort || !p) {
             return;
-        }
-        for (auto ch=0; ch<12; ++ch) {
-            if (!_activeChannelMap[ch]) {
-                emit updateStatus(ch, 0);
-                continue;
-            }
-            emit updateStatus(ch, 1);
         }
         auto& FEE = *p;
         for (int ch=0; ch<12; ++ch) {

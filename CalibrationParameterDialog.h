@@ -94,9 +94,9 @@ public:
         hideRestoreTimeDelays();
 
         // connections
-        connect(_ui->radioButtonTimeAlign, &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(false); });
-        connect(_ui->radioButtonADC_DELAY, &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(false); });
-        connect(_ui->radioButtonCFD_ZERO,  &QRadioButton::clicked, this, [=]() { _ui->groupParametersCFD_ZERO->setVisible(true);  });
+        connect(_ui->radioButtonTimeAlign, &QRadioButton::clicked, this, [=]() { updateCalibrationStatus(); _ui->groupParametersCFD_ZERO->setVisible(false); });
+        connect(_ui->radioButtonADC_DELAY, &QRadioButton::clicked, this, [=]() { updateCalibrationStatus(); _ui->groupParametersCFD_ZERO->setVisible(false); });
+        connect(_ui->radioButtonCFD_ZERO,  &QRadioButton::clicked, this, [=]() { updateCalibrationStatus(); _ui->groupParametersCFD_ZERO->setVisible(true);  });
 
         connect(_calibrationTasks.get(), SIGNAL(finished()),              this, SLOT(onCalibrationFinished()),            Qt::QueuedConnection);
         connect(_calibrationTasks.get(), SIGNAL(updateStatus(int,int)),   this, SLOT(onCalibrationStatusUpdate(int,int)), Qt::QueuedConnection);
@@ -172,6 +172,11 @@ protected:
         _ui->tabWidget->resize(newWidth - 38,
                                newHeight - 249);
     }
+    void updateCalibrationStatus() {
+        for (auto ch=0; ch<12; ++ch) {
+            _channelStatus.at(ch)->setStyleSheet(_colorStyles.at(_channelSelect.at(ch)->isChecked()));
+        }
+    }
 
 private slots:
     void onChannelSelect(int value) {
@@ -205,6 +210,9 @@ private slots:
         std::array<bool, 12> activeChannelMap;
         for (auto i=0; i<12; ++i) {
             activeChannelMap[i] = _channelSelect.at(i)->isChecked();
+            if (activeChannelMap[i]) {
+                _channelStatus.at(i)->setStyleSheet(_colorStyles.at(1));
+            }
         }
         _calibrationTasks->setActiveChannelMap(activeChannelMap);
         if (_ui->radioButtonTimeAlign->isChecked()) {
