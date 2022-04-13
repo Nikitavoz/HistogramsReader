@@ -16,6 +16,12 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>949</width>
+    <height>860</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Calibration</string>
   </property>
@@ -257,7 +263,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>181</width>
+      <width>182</width>
       <height>71</height>
      </rect>
     </property>
@@ -650,7 +656,7 @@
      <x>20</x>
      <y>240</y>
      <width>911</width>
-     <height>601</height>
+     <height>611</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -660,28 +666,24 @@
     <attribute name="title">
      <string>ALL</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEditALL">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>911</width>
-       <height>581</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::NoTextInteraction</set>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPlainTextEdit" name="plainTextEditALL">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <widget class="QWidget" name="tabCH01">
     <attribute name="title">
