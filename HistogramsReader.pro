@@ -28,6 +28,9 @@ FORMS += \
     calibration.ui \
     mainwindow.ui
 
+INCLUDEPATH += $$PWD/DIM
+LIBS += -L"$$PWD/DIM" -ldim
+
 RESOURCES += \
 		../!images/img.qrc
 

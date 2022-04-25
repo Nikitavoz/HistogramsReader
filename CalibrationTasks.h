@@ -8,6 +8,7 @@
 #include <QDebug>
 
 #include "FITelectronics.h"
+#include "DIM/dis.hxx"
 
 class CalibrationTasks : public QObject, public QRunnable
 {
@@ -24,8 +25,11 @@ public:
       , _iBd(0)
       , _timeDelays() {
         this->setAutoDelete(false);
+        DIMserver.setDnsNode("localhost");
+        DIMserver.start("Calibrations");
     }
   void run() {
+      isBusy = 1; isBusyService->updateService();
       _abort = false;
       if (_mode == "TimeAlign") {
           calibrateTimeOffsets();
@@ -37,6 +41,7 @@ public:
           calibrateCFD_ZERO();
           emit finished();
       }
+      isBusy = 0; isBusyService->updateService();
   }
 
   void setAbort(bool value = true) {
@@ -357,6 +362,10 @@ private:
     QString _ipAddress;
     int _iBd;
     std::array<quint32,12> _timeDelays;
+
+    DimServer DIMserver;
+    short isBusy = 0;
+    DimService *isBusyService = new DimService("BUSY_CALIBRATING", "S", &isBusy, 2);
 
 };
 
