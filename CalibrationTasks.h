@@ -106,7 +106,7 @@ protected:
         FEE.reset();
         Sleep(10);
         FEE.switchHistogramming(true);
-        int sleepTimeMSec = 500;  // 500e-3 sec
+        int const sleepTimeMSec = 500;  // 500e-3 sec
         Sleep(sleepTimeMSec);
         auto n = FEE.readHistograms(hTime);
         emit logMessage(0, QString::asprintf("Read Histograms(%d)\n\n",n.read));
@@ -116,7 +116,7 @@ protected:
 
         std::array<double,12> meanTime, stdTime;
         std::array<int,12>    timeOK, nEntries;
-        computeMeanStd(FEE, 0, 1e-3*sleepTimeMSec, meanTime,stdTime,timeOK,nEntries);
+        computeMeanStd(FEE, 0, 1e-3f*sleepTimeMSec, meanTime,stdTime,timeOK,nEntries);
         for (auto ch=0; ch<12; ++ch) {
             if (!_activeChannelMap[ch]) {
                 continue;
@@ -231,7 +231,7 @@ protected:
             FEE.writeADCRegisters(adcRegs);
             Sleep(10);
             success = FEE.readCounters(countersOld);
-            Sleep(100); // expect max. 100ms * _refRatekHz entries
+            Sleep(100); // expect max. 100ms * 1e3 * _refRatekHz entries
             success = FEE.readCounters(counters);
             bool nonZeroRates[12] = {false};
             for (int ch=0; ch<12; ++ch  ) {
