@@ -89,6 +89,11 @@ protected slots:
     }
 
 protected:
+    int computeSleepTimeMSec(int nEntriesRequired=100) const {
+        // wait at least 200 ms or until nEntriesRequired entries are expected, given _refRatekHz
+        return std::max(200L, std::lround(nEntriesRequired / (1e3* _refRatekHz)));
+    }
+
     // Time Alignment Calibration
     void calibrateTimeOffsets() {
         auto p = makeAndSetupFEE();
@@ -106,7 +111,7 @@ protected:
         FEE.reset();
         Sleep(10);
         FEE.switchHistogramming(true);
-        int const sleepTimeMSec = 500;  // 500e-3 sec
+        int const sleepTimeMSec = computeSleepTimeMSec();  // 500e-3 sec
         Sleep(sleepTimeMSec);
         auto n = FEE.readHistograms(hTime);
         emit logMessage(0, QString::asprintf("Read Histograms(%d)\n\n",n.read));
@@ -231,7 +236,7 @@ protected:
             FEE.writeADCRegisters(adcRegs);
             Sleep(10);
             success = FEE.readCounters(countersOld);
-            Sleep(100); // expect max. 100ms * 1e3 * _refRatekHz entries
+            Sleep(computeSleepTimeMSec()); // adjusted to have at least ~100 entries in the histogram
             success = FEE.readCounters(counters);
             bool nonZeroRates[12] = {false};
             for (int ch=0; ch<12; ++ch  ) {
