@@ -18,6 +18,7 @@ std::unique_ptr<FITelectronics> CalibrationTasks::makeAndSetupFEE()
 
 void CalibrationTasks::computeMeanStd(FITelectronics &_FEE,
                                      int typeHist,
+                                     float sleepTimeSec,
                                      std::array<double,12>& mean,
                                      std::array<double,12>& std,
                                      std::array<int,12>& isOK,
@@ -74,7 +75,7 @@ void CalibrationTasks::computeMeanStd(FITelectronics &_FEE,
             }
         }
         isOK[ch] = false;
-        if (sumW > 100) {
+        if (sumW > 0.8 * sleepTimeSec * 1e3 * _refRatekHz) { // require at leat 80% of expected entries
             mean[ch] = sumWX;
             std[ch]  = std::sqrt(sumWXX - sumWX*sumWX);
             isOK[ch] = (typeHist == 0 ? std[ch] < 80 : true);
@@ -172,12 +173,13 @@ bool CalibrationTasks::adjustAttenuatorADC(FITelectronics& FEE, int ch0, float r
         FEE.reset();
         Sleep(10);
         FEE.switchHistogramming(true);
-        Sleep(200);
+        int const sleepTimeMSec = 200; // 200e-3 seconds
+        Sleep(sleepTimeMSec);
         FEE.readHistograms(hAmpl);
 
         std::array<double,12> meanAmpl, stdAmpl;
         std::array<int,12>    amplOK, nEntries;
-        computeMeanStd(FEE, 1, meanAmpl, stdAmpl, amplOK, nEntries);
+        computeMeanStd(FEE, 1, 1e-3f*sleepTimeMSec, meanAmpl, stdAmpl, amplOK, nEntries);
         emit logMessage(1+ch0, QString::asprintf("steps=%5d ADC=%6.1f+-%.1f (N=%d)\n", attenSteps, meanAmpl[ch0], stdAmpl[ch0], nEntries[ch0]));
         emit addPointADCvSteps(ch0, attenSteps, meanAmpl[ch0], false); //calPlots.addPoint(attenSteps, charge);
 
@@ -289,10 +291,11 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
 
             FEE.switchHistogramming(true);
             success = FEE.readCounters(countersOld);
-            Sleep(200);
+            int const sleepTimeMSec = 200; // 200e-3 sec
+            Sleep(sleepTimeMSec);
             success = FEE.readCounters(counters);
             FEE.readHistograms(hTime);
-            computeMeanStd(FEE, 0, meanTime,stdTime,timeOK,nEntries);
+            computeMeanStd(FEE, 0, 1e-3f*sleepTimeMSec, meanTime,stdTime,timeOK,nEntries);
             QVector<quint32> histLine(401);
             for (int k=0; k<4096; ++k) {
                 int const signedTime = (k>=2048 ? k-4096 : k);

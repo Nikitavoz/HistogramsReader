@@ -123,6 +123,15 @@ public:
         QTextStream(&s) >> adcPerMip;
         return adcPerMip;
     }
+    void setRefRatekHz(float value) {
+        _ui->lineEditRefRatekHz->setText(QString::asprintf("%g", value));
+    }
+    float getRefRatekHz() const {
+        auto s = _ui->lineEditRefRatekHz->text();
+        float refRatekHz = 1.0f;
+        QTextStream(&s) >> refRatekHz;
+        return refRatekHz;
+    }
     quint32 getInitialSteps() const {
         auto s = _ui->lineEditInitAttenSteps->text();
         quint32 steps = 7100;
@@ -215,6 +224,7 @@ private slots:
             }
         }
         _calibrationTasks->setActiveChannelMap(activeChannelMap);
+        _calibrationTasks->setRefRatekHz(getRefRatekHz());
         if (_ui->radioButtonTimeAlign->isChecked()) {
             _calibrationTasks->setMode("TimeAlign");
             _ui->groupChannelStatus->setTitle("Calibration Status - Time Alignment");

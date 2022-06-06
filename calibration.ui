@@ -752,7 +752,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>270</x>
      <y>150</y>
      <width>111</width>
      <height>23</height>
@@ -761,6 +761,48 @@
    <property name="text">
     <string>Restore TimeDelays</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxRefRate">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>130</y>
+     <width>91</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Reference Rate</string>
+   </property>
+   <widget class="QLineEdit" name="lineEditRefRatekHz">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>kHz</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

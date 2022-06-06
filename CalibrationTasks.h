@@ -19,6 +19,7 @@ public:
       , _abort(false)
       , _activeChannelMap()
       , _mode("TimeAlign")
+      , _refRatekHz(1)
       , _ADCpMIP(16)
       , _initialSteps(7200)
       , _ipAddress(ipAddress)
@@ -52,6 +53,7 @@ public:
   }
   void setiBd(int i) { _iBd = i; }
   void setMode(QString mode) { _mode = mode; }
+  void setRefRatekHz(float value) {_refRatekHz = value; }
   void setADCpMIP(float value) {_ADCpMIP = value; }
   void setInitialSteps(int value) {_initialSteps = value; }
   void setActiveChannelMap(std::array<bool,12> map) { _activeChannelMap = map; }
@@ -87,6 +89,11 @@ protected slots:
     }
 
 protected:
+    int computeSleepTimeMSec(int nEntriesRequired=100) const {
+        // wait at least 200 ms or until nEntriesRequired entries are expected, given _refRatekHz
+        return std::max(200L, std::lround(nEntriesRequired / (1e3* _refRatekHz)));
+    }
+
     // Time Alignment Calibration
     void calibrateTimeOffsets() {
         auto p = makeAndSetupFEE();
@@ -104,7 +111,8 @@ protected:
         FEE.reset();
         Sleep(10);
         FEE.switchHistogramming(true);
-        Sleep(500);
+        int const sleepTimeMSec = computeSleepTimeMSec();  // 500e-3 sec
+        Sleep(sleepTimeMSec);
         auto n = FEE.readHistograms(hTime);
         emit logMessage(0, QString::asprintf("Read Histograms(%d)\n\n",n.read));
 
@@ -113,7 +121,7 @@ protected:
 
         std::array<double,12> meanTime, stdTime;
         std::array<int,12>    timeOK, nEntries;
-        computeMeanStd(FEE, 0, meanTime,stdTime,timeOK,nEntries);
+        computeMeanStd(FEE, 0, 1e-3f*sleepTimeMSec, meanTime,stdTime,timeOK,nEntries);
         for (auto ch=0; ch<12; ++ch) {
             if (!_activeChannelMap[ch]) {
                 continue;
@@ -192,7 +200,7 @@ protected:
         std::copy(adcRegs, adcRegs+4*12, adcRegsOld);
         quint32 counters[24];
         quint32 countersOld[24];
-        int const m = 20000/200;
+        int const m = 20000/200 + 1; // steps of 200 from 0 to including 20000
         quint32 rates[12][m];
         for (int ch=0; ch<12; ++ch) {
             for (int i=0; i<m; ++i) {
@@ -228,7 +236,7 @@ protected:
             FEE.writeADCRegisters(adcRegs);
             Sleep(10);
             success = FEE.readCounters(countersOld);
-            Sleep(100);
+            Sleep(computeSleepTimeMSec()); // adjusted to have at least ~100 entries in the histogram
             success = FEE.readCounters(counters);
             bool nonZeroRates[12] = {false};
             for (int ch=0; ch<12; ++ch  ) {
@@ -345,6 +353,7 @@ protected:
 private:
     void computeMeanStd(FITelectronics&,
                         int typeHist,
+                        float sleepTimeSec,
                         std::array<double,12>& meanTime,
                         std::array<double,12>& stdTime,
                         std::array<int,12>& timeOK,
@@ -357,6 +366,7 @@ private:
     bool _abort;
     std::array<bool, 12> _activeChannelMap;
     QString _mode;
+    float _refRatekHz;
     float _ADCpMIP;
     int _initialSteps;
     QString _ipAddress;
