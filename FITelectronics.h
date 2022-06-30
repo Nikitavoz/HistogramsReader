@@ -242,7 +242,10 @@ public slots:
         }
     }
 
-    void reset() { setBit(9, iBd ? iBd*0x200 + 0x7F : 0x0F); }
+	void reset() {
+		if (iBd == 0) setBit(10,			 0x0E, false); //TCM
+		else		  setBit(13, iBd*0x200 + 0x7E, false); //PM
+	}
     void switchHistogramming(bool on) { if (on) setBit(15, iBd*0x200 + 0x7E); else clearBit(15, iBd*0x200 + 0x7E); }
     void switchBCfilter     (bool on) { if (on) setBit(12, iBd*0x200 + 0x7E); else clearBit(12, iBd*0x200 + 0x7E); }
     void setBC(int id) { if (id >= 0 && id < 0xDEC) writeNbits(iBd*0x200 + 0x7E, id, 12); }

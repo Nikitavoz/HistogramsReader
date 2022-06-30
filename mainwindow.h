@@ -361,10 +361,12 @@ public slots:
         if (i == -1) on_comboBoxBoard_textActivated("TCM");
     }
     void on_comboBoxBoard_textActivated(const QString &text) {
-        if      (text == "rescan") { ui->tabWidget->setCurrentIndex(0); FEE.checkPMlinks();   return; }
+		if      (text == "rescan") { ui->tabWidget->setCurrentIndex(0); FEE.checkPMlinks(); return; }
         else if (text == "TCM") { ui->tabWidget->setCurrentIndex(0); FEE.iBd = 0; }
-        else if (QRegExp("PM[AC][0-9]").exactMatch(text)) { ui->tabWidget->setCurrentIndex(1); FEE.iBd = (text[2].toLatin1() == 'A' ? 1 : 11) + text[3].toLatin1() - '0'; }
-        else return;
+		else if (QRegExp("PM[AC][0-9]").exactMatch(text)) {
+			if (ui->tabWidget->currentIndex() == 0) ui->tabWidget->setCurrentIndex(1);
+			FEE.iBd = (text[2].toLatin1() == 'A' ? 1 : 11) + text[3].toLatin1() - '0';
+		} else return;
         ui->buttonReset->setText("RESET (" + text + ")");
         ui->pushButtonCalibrationPM->setText("CALIB (" + text + ")");
         checkBoardSelection();

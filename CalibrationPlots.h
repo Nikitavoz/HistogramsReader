@@ -1,6 +1,7 @@
 #ifndef CALIBRATIONPLOTS_H
 #define CALIBRATIONPLOTS_H
 
+#include <array>
 #include <QList>
 #include "qcustomplot.h"
 

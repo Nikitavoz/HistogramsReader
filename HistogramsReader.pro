@@ -28,8 +28,8 @@ FORMS += \
     calibration.ui \
     mainwindow.ui
 
-INCLUDEPATH += $$PWD/DIM
-LIBS += -L"$$PWD/DIM" -ldim
+INCLUDEPATH += $$PWD/../DIM/dim
+LIBS += -L"$$PWD/../DIM/bin" -ldim
 
 RESOURCES += \
 		../!images/img.qrc

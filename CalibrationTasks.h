@@ -6,9 +6,10 @@
 #include <QElapsedTimer>
 #include "switch.h"
 #include <QDebug>
+#include <array>
 
 #include "FITelectronics.h"
-#include "DIM/dis.hxx"
+#include "dis.hxx"
 
 class CalibrationTasks : public QObject, public QRunnable
 {
