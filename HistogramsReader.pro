@@ -10,13 +10,13 @@ CONFIG += c++latest
 
 SOURCES += \
     CalibrationTasks.cpp \
-        qcustomplot.cpp qcpdocumentobject.cpp \
+    qcustomplot.cpp qcpdocumentobject.cpp \
     main.cpp
 
 HEADERS += \
         CalibrationParameterDialog.h qcpdocumentobject.h \
-    CalibrationPlots.h \
-    CalibrationTasks.h \
+        CalibrationPlots.h \
+        CalibrationTasks.h \
 	qcustomplot.h \
 	mainwindow.h \
 	IPbusHeaders.h \
