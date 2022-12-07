@@ -151,7 +151,7 @@ public:
             wordsRead = readFast(start, DTr[TCMmode.selectableHist ? 0 : 1].BC, end - start, false, 6);
             return {wordsRead, end - start};
         }
-        clearBit(15, iBd*0x200 + 0x7E, false); //set PM histogramming off
+        //clearBit(15, iBd*0x200 + 0x7E, false); //set PM histogramming off
         if (hType == hTime)
             for (quint8 iCh=0; iCh<12; ++iCh) {
                 writeRegister                      (iBd*0x200+0xF5,                  iCh*regBlockSizeCh + dataOffset[hTime], false);
@@ -178,7 +178,7 @@ public:
             addTransaction(nonIncrementingRead,     iBd*0x200+0xF6, (quint32*)&DCh +  11*histDataSizeCh + dataOffsetNeg[hADC1], dataSizeNeg[hADC1]);
             if (transceive()) wordsRead += dataSizeNeg[hAmpl];
         }
-        if (histStatus.histOn) setBit(15, iBd*0x200 + 0x7E, false); //restore histogramming state
+        //if (histStatus.histOn) setBit(15, iBd*0x200 + 0x7E, false); //restore histogramming state
         return { wordsRead, 12U * (dataSize[hType] + dataSizeNeg[hType]) };
     }
 
