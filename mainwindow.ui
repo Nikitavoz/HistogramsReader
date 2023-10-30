@@ -159,7 +159,113 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QCustomPlot" name="plotTrigSelectable" native="true"/>
+         <widget class="QCustomPlot" name="plotTrigSelectableHist" native="true">
+          <widget class="QComboBox" name="comboBoxSelectableHistogramTCM">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>-1</y>
+             <width>101</width>
+             <height>15</height>
+            </rect>
+           </property>
+           <property name="currentText">
+            <string notr="true">disabled</string>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <property name="maxVisibleItems">
+            <number>16</number>
+           </property>
+           <property name="maxCount">
+            <number>16</number>
+           </property>
+           <property name="frame">
+            <bool>true</bool>
+           </property>
+           <item>
+            <property name="text">
+             <string notr="true">disabled</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>OrA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>OrC/OuterRings</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>SemiCentral/Nchannels</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Central/Charge</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Vertex/InnerRings</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>NoiseA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>NoiseC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Total noise</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CB-OrA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CB-OrC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Interaction</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CB-Interaction</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CV-Vertex/CB-InnerRings</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>BackgroundA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>BackgroundC</string>
+            </property>
+           </item>
+          </widget>
+         </widget>
         </item>
         <item>
          <widget class="QCustomPlot" name="plotTrigOrA" native="true"/>
@@ -673,7 +779,7 @@
       <property name="title">
        <string/>
       </property>
-      <widget class="Switch" name="switchHistorgammingPM" native="true">
+      <widget class="Switch" name="switchHistorgammingPM">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -682,10 +788,10 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="text" stdset="0">
+       <property name="text">
         <string/>
        </property>
-       <property name="SwitchOnClick" stdset="0">
+       <property name="SwitchOnClick">
         <bool>false</bool>
        </property>
       </widget>
@@ -715,7 +821,7 @@
         <string>BC filter</string>
        </property>
       </widget>
-      <widget class="Switch" name="switchFilterPM" native="true">
+      <widget class="Switch" name="switchFilterPM">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -724,7 +830,7 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="SwitchOnClick" stdset="0">
+       <property name="SwitchOnClick">
         <bool>false</bool>
        </property>
       </widget>
@@ -751,7 +857,7 @@
         </rect>
        </property>
        <property name="prefix">
-        <string>0x</string>
+        <string/>
        </property>
        <property name="maximum">
         <number>3563</number>
@@ -760,7 +866,7 @@
         <number>3563</number>
        </property>
        <property name="displayIntegerBase">
-        <number>16</number>
+        <number>10</number>
        </property>
       </widget>
       <widget class="QLabel" name="labelBoard">
@@ -1034,124 +1140,6 @@
         </property>
        </widget>
       </widget>
-      <widget class="QComboBox" name="comboBoxSelectableHistogramTCM">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>191</y>
-         <width>96</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <property name="maxVisibleItems">
-        <number>16</number>
-       </property>
-       <property name="maxCount">
-        <number>16</number>
-       </property>
-       <property name="frame">
-        <bool>true</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string notr="true">disabled</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>OrA</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>OrC/OuterRings</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>SemiCentral/Nchannels</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Central/Charge</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Vertex/InnerRings</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>NoiseA</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>NoiseC</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Total noise</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>True OrA</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>True OrC</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Interaction</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>True Interaction</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>True Vertex</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Beam-gas A</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Beam-gas C</string>
-        </property>
-       </item>
-      </widget>
-      <widget class="QLabel" name="labelFirstHistorgramTCM">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>175</y>
-         <width>96</width>
-         <height>13</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>First histogram:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
       <widget class="QGroupBox" name="groupBoxDataRead">
        <property name="geometry">
         <rect>
@@ -1297,7 +1285,7 @@
        <property name="geometry">
         <rect>
          <x>3</x>
-         <y>174</y>
+         <y>170</y>
          <width>94</width>
          <height>21</height>
         </rect>

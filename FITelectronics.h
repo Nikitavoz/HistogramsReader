@@ -1,6 +1,6 @@
 #ifndef FITELECTRONICS_H
 #define FITELECTRONICS_H
-
+#include <QDateTime>
 #include "IPbusInterface.h"
 enum TypeOfHistogram             { hTrig = 0, hTime = 1, hAmpl = 2, hADC0 = 3,  hADC1 = 4 };
 constexpr quint16 dataSize     []{     0xDEC,      2048,    2*2048,      2048,       2048 };
@@ -17,6 +17,42 @@ struct TypeStats {
     double mean, RMS;
 };
 struct TypeResultSize { size_t read, expected; };
+enum TypeFITsubdetector {_0_=0, FT0=1, FV0=2, FDD=3};
+const struct {char name[4];}  FIT[4] = { "???", "FT0", "FV0", "FDD"};
+const struct {const char *name,										   *description;} COUNTERS[2][15] = {
+{//FT0, FDD
+			 {           "OrA",                               "TRG-events on A-side"},//5
+			 {           "OrC",                               "TRG-events on C-side"},//4
+			 {   "SemiCentral","sum charge is between Semicental and Central levels"},//2
+			 {       "Central",                         "sum charge > Central level"},//1
+			 {        "Vertex",              "(timeC - timeA) is within time limits"},//3
+			 {        "NoiseA",                "A-side out-of-gate hits AND NOT OrA"},
+			 {        "NoiseC",                "C-side out-of-gate hits AND NOT OrC"},
+			 {   "Total noise",                                   "NoiseA OR NoiseC"},
+			 {        "CB-OrA",                               "collision-BC AND OrA"},
+			 {        "CB-OrC",                               "collision-BC AND OrC"},
+			 {   "Interaction",                        "both sides Or (OrA AND OrC)"},
+			 {"CB-Interaction",                       "collision-BC AND Interaction"},
+			 {     "CB-Vertex",                            "collision-BC AND Vertex"},
+			 {   "BackgroundA",                                   "beam1-BC AND OrC"},
+			 {   "BackgroundC",                                   "beam2-BC AND OrA"}
+}, {//FV0
+			 {            "Or",                          "TRG-events in any channel"},//5
+			 {    "OuterRings",               "PMA5-9 sum charge > OuterRings level"},//4
+			 {     "Nchannels",    "number of channels having TRG-event > Nch level"},//2
+			 {        "Charge",                     "sum charge > TotalCharge level"},//1
+			 {    "InnerRings",               "PMA0-4 sum charge > InnerRings level"},//3
+			 {         "Noise",                        "out-of-gate hits AND NOT Or"},
+			 {              "",                                                   ""},
+			 {         "Noise",                        "out-of-gate hits AND NOT Or"},
+			 {         "CB-Or",                                "collision-BC AND Or"},
+			 {              "",                                                   ""},
+			 {              "",                                                   ""},
+			 {              "",                                                   ""},
+			 { "CB-InnerRings",                        "collision-BC AND InnerRings"},
+			 {              "",                                                   ""},
+			 {   "BackgroundC",                                    "beam2-BC AND Or"}
+}};
 
 class FITelectronics: public IPbusTarget {
     Q_OBJECT
@@ -89,6 +125,9 @@ public:
             line3signalStable	: 1,
             linkOK              : 1;
     } triggerLinkStatus;
+	bool logging = false;
+	QFile fCounts, fCRates;
+	QTextStream osCounts, osCRates;
 
     struct TypeChannelHistogramData {
         quint16
@@ -107,9 +146,9 @@ public:
     } DCh[12];
     struct TypeTriggerHistogramData {
         quint32 BC[regBlockSizeTr] = {0};
-    } DTr[3];
+	} DTr[4];
 
-    std::function<const quint32(quint8, qint16)> binValue[5] = {
+    std::function<quint32(quint8, qint16)> binValue[5] = {
         [&](quint8 iCh, qint16 bin) { return DTr[iCh].          BC[bin]; },
         [&](quint8 iCh, qint16 bin) { return DCh[iCh].binValueTime(bin); },
         [&](quint8 iCh, qint16 bin) { return DCh[iCh].binValueAmpl(bin); },
@@ -151,7 +190,7 @@ public:
             wordsRead = readFast(start, DTr[TCMmode.selectableHist ? 0 : 1].BC, end - start, false, 6);
             return {wordsRead, end - start};
         }
-        clearBit(15, iBd*0x200 + 0x7E, false); //set PM histogramming off
+        //clearBit(15, iBd*0x200 + 0x7E, false); //set PM histogramming off
         if (hType == hTime)
             for (quint8 iCh=0; iCh<12; ++iCh) {
                 writeRegister                      (iBd*0x200+0xF5,                  iCh*regBlockSizeCh + dataOffset[hTime], false);
@@ -178,7 +217,7 @@ public:
             addTransaction(nonIncrementingRead,     iBd*0x200+0xF6, (quint32*)&DCh +  11*histDataSizeCh + dataOffsetNeg[hADC1], dataSizeNeg[hADC1]);
             if (transceive()) wordsRead += dataSizeNeg[hAmpl];
         }
-        if (histStatus.histOn) setBit(15, iBd*0x200 + 0x7E, false); //restore histogramming state
+        //if (histStatus.histOn) setBit(15, iBd*0x200 + 0x7E, false); //restore histogramming state
         return { wordsRead, 12U * (dataSize[hType] + dataSizeNeg[hType]) };
     }
 
@@ -249,8 +288,7 @@ public slots:
     void switchHistogramming(bool on) { if (on) setBit(15, iBd*0x200 + 0x7E); else clearBit(15, iBd*0x200 + 0x7E); }
     void switchBCfilter     (bool on) { if (on) setBit(12, iBd*0x200 + 0x7E); else clearBit(12, iBd*0x200 + 0x7E); }
     void setBC(int id) { if (id >= 0 && id < 0xDEC) writeNbits(iBd*0x200 + 0x7E, id, 12); }
-    void selectTriggerHistogram(quint8 n) { writeNbits(0x0E, n, 4, 4, false); if (n && TCMmode.selectableHist != n) reset(); }
-
+	void selectTriggerHistogram(quint8 n) { writeNbits(0x0E, n, 4, 4, false); if (n && TCMmode.selectableHist != n) reset(); }
     bool readTimeAlignment(quint32* data) {
         addTransaction(read, iBd*0x200 + 1, data, 12);
         return transceive();
@@ -280,7 +318,37 @@ public slots:
     void writeAtten(quint32 reg) {
         writeRegister(0x03, reg);
     }
-
+	void startLog(QString name) {
+		static QString logHeader;
+		if (logHeader.isEmpty()) {
+			logHeader = "Timestamp(CERNtime)\\BCid";
+			for (quint16 BCid=0; BCid<dataSize[hTrig]; ++BCid) logHeader.append("," + QString::number(BCid));
+			logHeader.append('\n');
+		}
+		memset(DTr[3].BC, 0, dataSize[hTrig]*4);
+		QString dt = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+		fCounts.setFileName(name + "_perBCcounts_" + dt + ".csv"); fCounts.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
+		fCRates.setFileName(name + "_perBCrates_"  + dt + ".csv"); fCRates.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
+		osCounts.setDevice(&fCounts); osCounts << logHeader;
+		osCRates.setDevice(&fCRates); osCRates << logHeader;
+		logging = true;
+	}
+	void stopLog() {
+		if (!logging) return;
+		logging = false;
+		osCounts.flush(); fCounts.close();
+		osCRates.flush(); fCRates.close();
+	}
+	void logCountsRates() {
+		QString dt = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss.zzz");
+		osCounts << dt; osCRates << dt;
+		for (quint16 id=0; id<dataSize[hTrig]; ++id) {
+			osCounts << ',' << QString::number(DTr[0].BC[id]);
+			osCRates << ',' << QString::number(DTr[0].BC[id] - DTr[3].BC[id]);
+		}
+		memcpy(DTr[3].BC, DTr[0].BC, dataSize[hTrig]*4);
+		osCounts << Qt::endl; osCRates << Qt::endl;
+	}
 };
 
 #endif // FITELECTRONICS_H

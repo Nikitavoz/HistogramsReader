@@ -325,16 +325,6 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
     emit logMessage(0, "\n\n");
     setAttenuator(FEE, attenStepsOrig, true);
 
-//    calPlots.rescaleDataRanges();
-//    calPlots.rescaleAxes();
-//    calPlots.setAxisRange(-50, 50, cfdZERO.front(), cfdZERO.back());
-//    calPlots.replot();
-//    double const width = 1200;
-//    double const height = 600;
-//    QTextCursor cursor = ui->calTextOutput->textCursor();
-//    cursor.insertText(QString(QChar::ObjectReplacementCharacter), QCPDocumentObject::generatePlotFormat(&calPlots, width, height));
-//    ui->calTextOutput->setTextCursor(cursor);
-
     result.first = -1000;
     int& newCFDValue = result.first; // set to invalid
     emit logMessage(0, "\n PM  CH  CFD_ZERO");
@@ -345,6 +335,8 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
     float timeDifferenceLast = 100;
     bool haveSeenNegativeTimeDifference = false;
     int const refAttenIndex = (coarse ? 0 : 0);
+    int minTimeDifferenceIndex = -1; // invalid
+    double minTimeDifference = 0;
     for (int i=0; i<cfdZERO.size(); i+= 1+coarse) {
         emit logMessage(0, QString::asprintf(" %s  CH%02d %6d ",
                                        FEE.formatPM().c_str(),
@@ -360,27 +352,62 @@ std::pair<int,bool> CalibrationTasks::calCFDThreshold(FITelectronics& FEE, int c
         emit logMessage(0, QString::asprintf(" | %7.2f", tMinMax.second->tMean - tMinMax.first->tMean));
         emit logMessage(0, QString::asprintf(" %+8.2f", timeDifference));
         if (coarse) {
-            if (times[ch0][i][refAttenIndex].rate >= 500 && timeDifference > 0 && timeDifferenceLast <= 0 && newCFDValue == -1000) {
-                // linear interpolation
-                float slope = (timeDifference - timeDifferenceLast) / (cfdZERO[i]-cfdZERO[i-1]);
-                newCFDValue = 5*std::lround((cfdZERO[i-1] - timeDifferenceLast / slope)/5);
-                emit logMessage(0, QString::asprintf(" <----- ***** (%d)\n", newCFDValue));
-                result.second = true;
-           } else {
-                emit logMessage(0, "\n");
-           }
+            if (times[ch0][i][refAttenIndex].rate >= 500) {
+                // detect zero-crossing
+                if (timeDifference > 0 && timeDifferenceLast <= 0 && newCFDValue == -1000) {
+                    // linear interpolation
+                    float slope = (timeDifference - timeDifferenceLast) / (cfdZERO[i]-cfdZERO[i-1]);
+                    newCFDValue = 5*std::lround((cfdZERO[i-1] - timeDifferenceLast / slope)/5);
+                    emit logMessage(0, QString::asprintf(" <----- ***** (%d)\n", newCFDValue));
+                    result.second = true;
+                } else {
+                    emit logMessage(0, "\n");
+                }
+                // find minimum time difference
+                if (minTimeDifferenceIndex == -1) {
+                    minTimeDifferenceIndex = i;
+                    minTimeDifference = std::abs(timeDifference);
+                } else {
+                    if (std::abs(timeDifference) < minTimeDifference) {
+                        minTimeDifferenceIndex = i;
+                        minTimeDifference = std::abs(timeDifference);
+                    }
+                }
+            }
         } else { // fine adjustment
-            if (times[ch0][i][refAttenIndex].rate >= 990 && timeDifference >= 1.5 && haveSeenNegativeTimeDifference && newCFDValue == -1000) {
-                newCFDValue = cfdZERO[i];
-                emit logMessage(0, " <----- *****\n");
-                result.second = true;
-            } else {
-                emit logMessage(0, "\n");
+            if (times[ch0][i][refAttenIndex].rate >= 990) {
+                // detect zero-crossing
+                if (timeDifference >= 1.5 && haveSeenNegativeTimeDifference && newCFDValue == -1000) {
+                    newCFDValue = cfdZERO[i];
+                    emit logMessage(0, " <----- *****\n");
+                    result.second = true;
+                } else {
+                    emit logMessage(0, "\n");
+                }
+                // find minimum time difference
+                if (minTimeDifferenceIndex == -1) {
+                    minTimeDifferenceIndex = i;
+                    minTimeDifference = std::abs(timeDifference);
+                } else {
+                    if (std::abs(timeDifference) < minTimeDifference) {
+                        minTimeDifferenceIndex = i;
+                        minTimeDifference = std::abs(timeDifference);
+                    }
+                }
             }
         }
         timeDifferenceLast = timeDifference;
     }
     emit logMessage(0, "\n\n");
+
+    // when there is no zero-crossing, use minimum time difference
+    if (result.second == false) {
+        if (minTimeDifferenceIndex != -1) {
+            newCFDValue = cfdZERO[minTimeDifferenceIndex];
+            result.second = true;
+            emit logMessage(0, "no zero-crossing found, using min(abs(timeDifference))\n");
+        }
+    }
 
     success = FEE.writeADCRegisters(adcRegsOld);
     emit logMessage(0, success ? "\nOK\n" : "\nFAILED\n");

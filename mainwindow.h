@@ -10,9 +10,8 @@
 #include "ui_mainwindow.h"
 #include "switch.h"
 #include "FITelectronics.h"
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
-#include <QElapsedTimer>
+//#include <QtSerialPort/QSerialPort>
+//#include <QtSerialPort/QSerialPortInfo>
 
 #include "CalibrationParameterDialog.h"
 #include "CalibrationPlots.h"
@@ -40,9 +39,10 @@ public:
     QRegExp validIPaddressRE {"([1-9][0-9]?|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.(([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){2}([1-9][0-9]?|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"};
     QAction *recheck;
     FITelectronics FEE;
+	quint8 sd;
     QSettings settings;
     int fontSize_px, axisLength_px;
-    bool ok, FV0 = false, lg = false; //logarithmic scale for counts (y-axis)
+	bool ok, lg = false; //logarithmic scale for counts (y-axis)
     QList<QWidget *> allWidgets, PMwidgets, TCMwidgets;
     QElapsedTimer timer;
     TypeOfHistogram curType = hTrig;
@@ -81,7 +81,7 @@ public:
             if (!bars.isEmpty()) b->moveAbove(bars.last());
             bars.append(b);
         }
-        Histogram(QCustomPlot *p, quint8 index, TypeOfHistogram ht): plot(p), iCh(index), type(ht)  { addBars(); }
+        Histogram(QCustomPlot *p, quint8 index, TypeOfHistogram ht): plot(p), iCh(index), type(ht)  { plot->setAttribute(Qt::WA_OpaquePaintEvent); addBars(); }
         void setFullRange() { plot->xAxis->setRange((minBin[type]-0.5)*bars[0]->width(), (maxBin[type]+0.5)*bars[0]->width()); }
     };
     QVector<QList<Histogram *>> H {3};
@@ -183,25 +183,11 @@ public:
         connect(&FEE, &IPbusTarget::IPbusStatusOK, this, [=]() {
            ui->labelStatus->setStyleSheet(OKstyle);
            ui->labelStatus->setText("online");
-           FV0 = (FEE.readRegister(0x7) & 0b11) == 2;
+		   sd = (FEE.readRegister(0x7) & 0b11);
            QComboBox *b = ui->comboBoxSelectableHistogramTCM;
-           b->setItemData(0x0, "disabled"                    , Qt::DisplayRole); b->setItemData(0x0, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x1,                  "OrA"        , Qt::DisplayRole); b->setItemData(0x1, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x2, FV0?"OuterRings":"OrC"        , Qt::DisplayRole); b->setItemData(0x2, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x3, FV0?"Nchannels" :"SemiCentral", Qt::DisplayRole); b->setItemData(0x3, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x4, FV0?"Charge"    :"Central"    , Qt::DisplayRole); b->setItemData(0x4, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x5, FV0?"InnerRings":"Vertex"     , Qt::DisplayRole); b->setItemData(0x5, ""                                   , Qt::ToolTipRole);
-           b->setItemData(0x6,             "NoiseA"          , Qt::DisplayRole); b->setItemData(0x6, "A-side out-of-gate hit AND NOT OrA" , Qt::ToolTipRole);
-           b->setItemData(0x7,             "NoiseC"          , Qt::DisplayRole); b->setItemData(0x7, "C-side out-of-gate hit AND NOT OrC" , Qt::ToolTipRole);
-           b->setItemData(0x8,             "Total noise"     , Qt::DisplayRole); b->setItemData(0x8, "NoiseA OR NoiseC"                   , Qt::ToolTipRole);
-           b->setItemData(0x9,             "True OrA"        , Qt::DisplayRole); b->setItemData(0x9, "bunch in both beams AND OrA"        , Qt::ToolTipRole);
-           b->setItemData(0xA,             "True OrC"        , Qt::DisplayRole); b->setItemData(0xA, "bunch in both beams AND OrC"        , Qt::ToolTipRole);
-           b->setItemData(0xB,             "Interaction"     , Qt::DisplayRole); b->setItemData(0xB, "both sides OR (OrA & OrC)"          , Qt::ToolTipRole);
-           b->setItemData(0xC,             "True Interaction", Qt::DisplayRole); b->setItemData(0xC, "bunch in both beams AND OrA AND OrC", Qt::ToolTipRole);
-           b->setItemData(0xD,             "True Vertex"     , Qt::DisplayRole); b->setItemData(0xD, "bunch in both beams AND Vertex"     , Qt::ToolTipRole);
-           b->setItemData(0xE,             "Beam-gas A"      , Qt::DisplayRole); b->setItemData(0xE, "bunch ONLY in beam 1 AND OrC"       , Qt::ToolTipRole);
-           b->setItemData(0xF,             "Beam-gas C"      , Qt::DisplayRole); b->setItemData(0xF, "bunch ONLY in beam 2 AND OrA"       , Qt::ToolTipRole);
-           ui->radButADC->setText(FV0 ? "ADC (≈83fC)" : "ADC (≈43fC)");
+		   b->                               setItemData(0,                    "disabled", Qt::DisplayRole); b->setItemData(0,                                   "", Qt::ToolTipRole);
+		   for (quint8 i=1; i<=15; ++i) { b->setItemData(i, COUNTERS[sd == FV0][i-1].name, Qt::DisplayRole); b->setItemData(i, COUNTERS[sd == FV0][i-1].description, Qt::ToolTipRole); }
+		   ui->radButADC->setText(sd == FV0 ? "ADC (≈83fC)" : "ADC (≈43fC)");
         });
         connect(&FEE, &IPbusTarget::error, this, [=](QString message, errorType et) {
             ui->labelStatus->setText(message);
@@ -243,6 +229,7 @@ public:
     }
 
     ~MainWindow() {
+		FEE.stopLog();
         settings.setValue("IPaddress", FEE.IPaddress);
         settings.setValue("AutoRead",  ui->autoRead->isChecked());
         settings.setValue("AutoResetValue",  ui->spinBoxMax->value());
@@ -288,7 +275,7 @@ public:
             h->plot->xAxis->setRange((first-0.5)*w, (last+0.5)*w);
         }
         h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
-        h->title->setText(h->name + (h->stats.sum ? QString::asprintf(" Σ=%d μ=%.2f σ=%.2f", h->stats.sum, h->stats.mean * w, h->stats.RMS * w) : " Σ=0"));
+		h->title->setText(h->name + (h->stats.sum ? QString::asprintf(" Σ=%llu μ=%.2f σ=%.2f", h->stats.sum, h->stats.mean * w, h->stats.RMS * w) : " Σ=0"));
         h->plot->yAxis->setRange(lg ? 0.8 : 0, (h->stats.max ? (lg ? roundUpOrder(h->stats.max) : roundUpPlace(h->stats.max)) : 5));
         h->plot->replot();
     }
@@ -344,9 +331,9 @@ public slots:
         } else { //TCM
             ui->comboBoxSelectableHistogramTCM->setCurrentIndex(FEE.TCMmode.selectableHist);
             ui->comboBoxSelectableHistogramTCM->setToolTip(ui->comboBoxSelectableHistogramTCM->currentData(Qt::ToolTipRole).toString());
-            H[hTrig].first()->name = ui->comboBoxSelectableHistogramTCM->currentText();
+			//H[hTrig].first()->name = ui->comboBoxSelectableHistogramTCM->currentText();
         }
-        ui->labelStatus->setText(ui->labelStatus->text() == "" ? "online" : "");
+		ui->labelStatus->setText(ui->labelStatus->text() == "" ? (FEE.logging ? "online & logging" : "online") : "");
         if (ui->autoRead->isChecked() && ui->buttonRead->isEnabled()) on_buttonRead_clicked();
     }
     void updateBoardsList(quint32 mask) {
@@ -361,6 +348,7 @@ public slots:
         if (i == -1) on_comboBoxBoard_textActivated("TCM");
     }
     void on_comboBoxBoard_textActivated(const QString &text) {
+		FEE.stopLog();
 		if      (text == "rescan") { ui->tabWidget->setCurrentIndex(0); FEE.checkPMlinks(); return; }
         else if (text == "TCM") { ui->tabWidget->setCurrentIndex(0); FEE.iBd = 0; }
 		else if (QRegExp("PM[AC][0-9]").exactMatch(text)) {
@@ -372,19 +360,25 @@ public slots:
         checkBoardSelection();
         FEE.sync();
     }
-    void on_comboBoxSelectableHistogramTCM_activated(int n) { FEE.selectTriggerHistogram(n); }
+	void on_comboBoxSelectableHistogramTCM_activated(int n) {
+		FEE.stopLog();
+		FEE.selectTriggerHistogram(n);
+		if (n && ui->autoRead->isChecked()) FEE.startLog( QString("%1_%2").arg(FIT[sd].name).arg(ui->comboBoxSelectableHistogramTCM->currentText()) );
+	}
     void on_switchHistorgammingPM_clicked(bool checked) { FEE.switchHistogramming(!checked); }
     void on_switchFilterPM_clicked(bool checked) { FEE.switchBCfilter(!checked); }
     void on_spinBoxBCfilterPM_valueChanged(int id) { FEE.setBC(id); }
     void on_buttonReset_clicked() { FEE.reset(); }
     void on_buttonRead_clicked() {
         readData();
+		if (FEE.logging) FEE.logCountsRates();
         showData();
+        double t, s=0.; QString st=""; foreach(Histogram *h, H[curType]) { t=h->plot->replotTime(); st.append(QString::asprintf("%4.2f ", t/1e3)); s+=t; }  qDebug("%s= %4.2f s", qPrintable(st), s/1e3);
         if (ui->doAutoReset->isChecked() && *max >= ui->spinBoxMax->value()) FEE.reset();
     }
     void on_buttonSave_clicked() {
         QString hName = ui->tabWidget->currentWidget()->objectName();
-        QFile f(QFileDialog::getSaveFileName(this, "Save " + hName + " histograms data", "./Histograms" + hName + ".csv", "Colon-separated values (*.csv)"));
+		QFile f(QFileDialog::getSaveFileName(this, "Save " + hName + " histograms data", "./Histograms" + hName + ".csv", "Colon-separated values (*.csv)"));
         f.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
         QTextStream out(&f);
         int width = curType == hTrig ? qMax(10, H[hTrig].first()->name.length()) : (curType == hAmpl ? 6 : 5);
@@ -507,6 +501,7 @@ public slots:
         if (ui->radBut_mV->isChecked()) { mVperMIP   = QInputDialog::getDouble(this,      "MIP/mV ratio",        "Set amount of mV per MIP",   mVperMIP, 1., 100., 1); on_radBut_mV_toggled(true); }
         else                            { ADCUperMIP = QInputDialog::getDouble(this, "MIP/ADCunit ratio", "Set amount of ADC units per MIP", ADCUperMIP, 1., 100., 0); on_radButMIP_toggled(true); }
     }
+	void on_autoRead_toggled(bool checked) { if (!checked) FEE.stopLog(); }
 
 private slots:
     void on_pushButtonCalibrationPM_clicked() {

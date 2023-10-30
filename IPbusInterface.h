@@ -38,6 +38,7 @@ public:
             updateTimer->stop();
             resetTransactions();
         });
+        qsocket->setProxy(QNetworkProxy::NoProxy);
         if (!qsocket->bind(QHostAddress::AnyIPv4, localport)) qsocket->bind(QHostAddress::AnyIPv4);
         updateTimer->start(updatePeriod_ms);
     }
