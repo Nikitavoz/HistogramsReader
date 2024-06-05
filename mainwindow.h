@@ -42,7 +42,7 @@ public:
 	quint8 sd;
     QSettings settings;
     int fontSize_px, axisLength_px;
-	bool ok, lg = false; //logarithmic scale for counts (y-axis)
+    bool ok, ps, lg = false; //logarithmic scale for counts (y-axis)
     QList<QWidget *> allWidgets, PMwidgets, TCMwidgets;
     QElapsedTimer timer;
     TypeOfHistogram curType = hTrig;
@@ -190,12 +190,14 @@ public:
 		   ui->radButADC->setText(sd == FV0 ? "ADC (≈83fC)" : "ADC (≈43fC)");
         });
         connect(&FEE, &IPbusTarget::error, this, [=](QString message, errorType et) {
+            ui->switchTriggersLoggingTCM->setChecked(false);
             ui->labelStatus->setText(message);
             ui->labelStatus->setStyleSheet(notOKstyle);
             ui->groupBoxControl->setDisabled(true);
             QMessageBox::warning(this, errorTypeName[et], message);
         });
         connect(&FEE, &IPbusTarget::noResponse, this, [=](QString message) {
+            ui->switchTriggersLoggingTCM->setChecked(false);
             ui->labelStatus->setText(ui->labelStatus->text() == "" ? message : "");
             ui->labelStatus->setStyleSheet(notOKstyle);
             ui->groupBoxControl->setDisabled(true);
@@ -221,10 +223,12 @@ public:
         s = settings.value("ChargeUnit", "ADC").toString(); if (s == "mV") ui->radBut_mV->setChecked(true); else if (s == "MIP") ui->radButMIP->setChecked(true);
         resize(settings.value("WindowSize", minimumSize()).toSize());
         if (settings.value("MaximizedWindow", false).toBool()) showMaximized();
+        ui->checkbox_ps->setChecked(settings.value("σ_in_ps", false).toBool());
         ui->labelStatus->clear();
         updateBoardsList(0);
         on_tabWidget_currentChanged(0);
         FEE.reconnect();
+        ui->switchTriggersLoggingTCM->setEnabled(false);
         _calibrationDialog = new CalibrationParameterDialog(FEE.IPaddress, ADCUperMIP, 7200, this);
     }
 
@@ -243,6 +247,7 @@ public:
         settings.setValue("ChargeUnit", ui->radButADC->isChecked() ? "ADC" : (ui->radBut_mV->isChecked() ? "mV" : "MIP"));
         settings.setValue("WindowSize", size());
         settings.setValue("MaximizedWindow", isMaximized());
+        settings.setValue("σ_in_ps", ui->checkbox_ps->isChecked());
         foreach(QList<Histogram *> group, H) foreach(Histogram *h, group) delete h;
         delete ui;
     }
@@ -275,7 +280,7 @@ public:
             h->plot->xAxis->setRange((first-0.5)*w, (last+0.5)*w);
         }
         h->stats = FEE.calcStats(h->type, h->iCh, h->plot->xAxis->range().lower/w, h->plot->xAxis->range().upper/w);
-		h->title->setText(h->name + (h->stats.sum ? QString::asprintf(" Σ=%llu μ=%.2f σ=%.2f", h->stats.sum, h->stats.mean * w, h->stats.RMS * w) : " Σ=0"));
+        h->title->setText(h->name + (h->stats.sum ? QString::asprintf(" Σ=%llu μ=%.2f σ=%.*f", h->stats.sum, h->stats.mean * w, ps?0:3, h->stats.RMS * w * (ps?1e3:1)) : " Σ=0"));
         h->plot->yAxis->setRange(lg ? 0.8 : 0, (h->stats.max ? (lg ? roundUpOrder(h->stats.max) : roundUpPlace(h->stats.max)) : 5));
         h->plot->replot();
     }
@@ -331,7 +336,6 @@ public slots:
         } else { //TCM
             ui->comboBoxSelectableHistogramTCM->setCurrentIndex(FEE.TCMmode.selectableHist);
             ui->comboBoxSelectableHistogramTCM->setToolTip(ui->comboBoxSelectableHistogramTCM->currentData(Qt::ToolTipRole).toString());
-			//H[hTrig].first()->name = ui->comboBoxSelectableHistogramTCM->currentText();
         }
 		ui->labelStatus->setText(ui->labelStatus->text() == "" ? (FEE.logging ? "online & logging" : "online") : "");
         if (ui->autoRead->isChecked() && ui->buttonRead->isEnabled()) on_buttonRead_clicked();
@@ -348,7 +352,7 @@ public slots:
         if (i == -1) on_comboBoxBoard_textActivated("TCM");
     }
     void on_comboBoxBoard_textActivated(const QString &text) {
-		FEE.stopLog();
+        ui->switchTriggersLoggingTCM->setChecked(false);
 		if      (text == "rescan") { ui->tabWidget->setCurrentIndex(0); FEE.checkPMlinks(); return; }
         else if (text == "TCM") { ui->tabWidget->setCurrentIndex(0); FEE.iBd = 0; }
 		else if (QRegExp("PM[AC][0-9]").exactMatch(text)) {
@@ -360,11 +364,12 @@ public slots:
         checkBoardSelection();
         FEE.sync();
     }
+    void on_comboBoxSelectableHistogramTCM_currentIndexChanged(int n) { ui->switchTriggersLoggingTCM->setEnabled(n && ui->autoRead->isChecked()); }
 	void on_comboBoxSelectableHistogramTCM_activated(int n) {
-		FEE.stopLog();
+        ui->switchTriggersLoggingTCM->setChecked(false);
 		FEE.selectTriggerHistogram(n);
-		if (n && ui->autoRead->isChecked()) FEE.startLog( QString("%1_%2").arg(FIT[sd].name).arg(ui->comboBoxSelectableHistogramTCM->currentText()) );
 	}
+    void on_switchTriggersLoggingTCM_toggled(bool checked) { checked ? FEE.startLog( QString("%1_%2").arg(FIT[sd].name).arg(ui->comboBoxSelectableHistogramTCM->currentText()) ) : FEE.stopLog(); }
     void on_switchHistorgammingPM_clicked(bool checked) { FEE.switchHistogramming(!checked); }
     void on_switchFilterPM_clicked(bool checked) { FEE.switchBCfilter(!checked); }
     void on_spinBoxBCfilterPM_valueChanged(int id) { FEE.setBC(id); }
@@ -373,7 +378,7 @@ public slots:
         readData();
 		if (FEE.logging) FEE.logCountsRates();
         showData();
-        double t, s=0.; QString st=""; foreach(Histogram *h, H[curType]) { t=h->plot->replotTime(); st.append(QString::asprintf("%4.2f ", t/1e3)); s+=t; }  qDebug("%s= %4.2f s", qPrintable(st), s/1e3);
+        //double t, s=0.; QString st=""; foreach(Histogram *h, H[curType]) { t=h->plot->replotTime(); st.append(QString::asprintf("%4.2f ", t/1e3)); s+=t; }  qDebug("%s= %4.2f s", qPrintable(st), s/1e3);
         if (ui->doAutoReset->isChecked() && *max >= ui->spinBoxMax->value()) FEE.reset();
     }
     void on_buttonSave_clicked() {
@@ -462,6 +467,7 @@ public slots:
         }
     };
     void on_tabWidget_currentChanged(int index) {
+        ui->switchTriggersLoggingTCM->setChecked(false);
         if (index == 3) { // Calibration logs
             return; // NOP for now
         }
@@ -492,8 +498,10 @@ public slots:
             else updatePlot(h);
         }
     }
+    void on_radBut_ns_toggled(bool checked) { ps = checked && ui->checkbox_ps->isChecked();
+                                              ui->checkbox_ps->setEnabled(checked);
+                                              if (checked) changeUnit(H[hTime], TDCunit_ns); }
     void on_radButTDC_toggled(bool checked) { if (checked) changeUnit(H[hTime],         1.); }
-    void on_radBut_ns_toggled(bool checked) { if (checked) changeUnit(H[hTime], TDCunit_ns); }
     void on_radButADC_toggled(bool checked) { if (checked) changeUnit(H[hAmpl],       1.             ); ui->buttonTune->setVisible(!checked); }
     void on_radBut_mV_toggled(bool checked) { if (checked) changeUnit(H[hAmpl], mVperMIP / ADCUperMIP); }
     void on_radButMIP_toggled(bool checked) { if (checked) changeUnit(H[hAmpl],       1. / ADCUperMIP); }
@@ -501,7 +509,12 @@ public slots:
         if (ui->radBut_mV->isChecked()) { mVperMIP   = QInputDialog::getDouble(this,      "MIP/mV ratio",        "Set amount of mV per MIP",   mVperMIP, 1., 100., 1); on_radBut_mV_toggled(true); }
         else                            { ADCUperMIP = QInputDialog::getDouble(this, "MIP/ADCunit ratio", "Set amount of ADC units per MIP", ADCUperMIP, 1., 100., 0); on_radButMIP_toggled(true); }
     }
-	void on_autoRead_toggled(bool checked) { if (!checked) FEE.stopLog(); }
+    void on_autoRead_toggled(bool checked) {
+        if (!checked) ui->switchTriggersLoggingTCM->setChecked(false);
+        ui->switchTriggersLoggingTCM->setEnabled(checked);
+    }
+    void on_checkbox_ps_toggled(bool checked) { ps = checked && ui->radBut_ns->isChecked(); }
+    void on_checkbox_ps_clicked() { foreach(Histogram *h, H[curType]) updatePlot(h); }
 
 private slots:
     void on_pushButtonCalibrationPM_clicked() {

@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1142</width>
     <height>704</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1024</width>
+    <width>1142</width>
     <height>704</height>
    </size>
   </property>
@@ -44,6 +44,9 @@
    <locale language="English" country="World"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QCheckBox, QRadioButton {spacing: 3}</string>
+   </property>
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,1" columnstretch="0,1">
     <property name="leftMargin">
      <number>0</number>
@@ -264,6 +267,76 @@
              <string>BackgroundC</string>
             </property>
            </item>
+          </widget>
+          <widget class="QLabel" name="labelTriggersLoggingTCM">
+           <property name="geometry">
+            <rect>
+             <x>396</x>
+             <y>-2</y>
+             <width>88</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Log to files this trigger counts and rates for each BC every second</string>
+           </property>
+           <property name="text">
+            <string>Per-BC logging:</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="labelTriggersLoggingOnTCM">
+           <property name="geometry">
+            <rect>
+             <x>530</x>
+             <y>-2</y>
+             <width>15</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Log to files this trigger counts and rates for each BC every second</string>
+           </property>
+           <property name="text">
+            <string>on</string>
+           </property>
+          </widget>
+          <widget class="Switch" name="switchTriggersLoggingTCM">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>500</x>
+             <y>-2</y>
+             <width>30</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Log to files this trigger counts and rates for each BC every second</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="SwitchOnClick">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="labelTriggersLoggingOffTCM">
+           <property name="geometry">
+            <rect>
+             <x>485</x>
+             <y>-2</y>
+             <width>15</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Log to files this trigger counts and rates for each BC every second</string>
+           </property>
+           <property name="text">
+            <string>off</string>
+           </property>
           </widget>
          </widget>
         </item>
@@ -720,6 +793,25 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QCheckBox" name="checkbox_ps">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>43</x>
+          <y>27</y>
+          <width>52</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string notr="true">read data each second</string>
+        </property>
+        <property name="text">
+         <string>σ in ps</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -783,7 +875,7 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>262</y>
+         <y>253</y>
          <width>30</width>
          <height>18</height>
         </rect>
@@ -799,7 +891,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>247</y>
+         <y>238</y>
          <width>88</width>
          <height>16</height>
         </rect>
@@ -812,7 +904,7 @@
        <property name="geometry">
         <rect>
          <x>1</x>
-         <y>290</y>
+         <y>288</y>
          <width>43</width>
          <height>16</height>
         </rect>
@@ -825,7 +917,7 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>306</y>
+         <y>304</y>
          <width>31</width>
          <height>18</height>
         </rect>
@@ -851,7 +943,7 @@
        <property name="geometry">
         <rect>
          <x>45</x>
-         <y>287</y>
+         <y>285</y>
          <width>54</width>
          <height>22</height>
         </rect>
@@ -946,7 +1038,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>262</y>
+         <y>253</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -959,7 +1051,7 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>262</y>
+         <y>253</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -972,7 +1064,7 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>306</y>
+         <y>304</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -985,7 +1077,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>306</y>
+         <y>304</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -998,7 +1090,7 @@
        <property name="geometry">
         <rect>
          <x>72</x>
-         <y>227</y>
+         <y>214</y>
          <width>16</width>
          <height>16</height>
         </rect>
@@ -1017,7 +1109,7 @@
        <property name="geometry">
         <rect>
          <x>72</x>
-         <y>209</y>
+         <y>196</y>
          <width>16</width>
          <height>16</height>
         </rect>
@@ -1036,7 +1128,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>211</y>
+         <y>198</y>
          <width>67</width>
          <height>13</height>
         </rect>
@@ -1052,7 +1144,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>228</y>
+         <y>215</y>
          <width>67</width>
          <height>13</height>
         </rect>

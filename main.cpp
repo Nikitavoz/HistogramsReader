@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName("INR");
     QCoreApplication::setApplicationName("HistogramReader");
-    QCoreApplication::setApplicationVersion("3.8 calibration");
+    QCoreApplication::setApplicationVersion("3.9 calibration");
     MainWindow w;
     w.show();
     return a.exec();
