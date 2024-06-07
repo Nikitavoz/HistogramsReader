@@ -481,6 +481,7 @@ public slots:
         ui->spinBoxThreshold->setMaximum(curType == hTrig ? UINT32_MAX : UINT16_MAX);
         checkBoardSelection();
         axisLength_px = H[curType].first()->plot->width() - 2 * fontSize_px;
+        ps = index == hTime && ui->radBut_ns->isChecked() && ui->checkbox_ps->isChecked();
         foreach(Histogram *h, H[curType]) updatePlot(h);
     }
     void changeUnit(QList<MainWindow::Histogram *> &group, double newBinWidth) {
