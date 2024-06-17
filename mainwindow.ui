@@ -835,9 +835,9 @@
       <widget class="QPushButton" name="buttonLoad">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>49</x>
          <y>12</y>
-         <width>46</width>
+         <width>47</width>
          <height>21</height>
         </rect>
        </property>
@@ -850,7 +850,7 @@
         <rect>
          <x>3</x>
          <y>12</y>
-         <width>46</width>
+         <width>47</width>
          <height>21</height>
         </rect>
        </property>
@@ -875,7 +875,7 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>253</y>
+         <y>228</y>
          <width>30</width>
          <height>18</height>
         </rect>
@@ -891,7 +891,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>238</y>
+         <y>215</y>
          <width>88</width>
          <height>16</height>
         </rect>
@@ -903,8 +903,8 @@
       <widget class="QLabel" name="labelFilterPM">
        <property name="geometry">
         <rect>
-         <x>1</x>
-         <y>288</y>
+         <x>2</x>
+         <y>248</y>
          <width>43</width>
          <height>16</height>
         </rect>
@@ -917,7 +917,7 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>304</y>
+         <y>262</y>
          <width>31</width>
          <height>18</height>
         </rect>
@@ -930,7 +930,7 @@
        <property name="geometry">
         <rect>
          <x>3</x>
-         <y>150</y>
+         <y>144</y>
          <width>94</width>
          <height>21</height>
         </rect>
@@ -943,7 +943,7 @@
        <property name="geometry">
         <rect>
          <x>45</x>
-         <y>285</y>
+         <y>245</y>
          <width>54</width>
          <height>22</height>
         </rect>
@@ -1038,7 +1038,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>253</y>
+         <y>228</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -1051,7 +1051,7 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>253</y>
+         <y>228</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -1064,7 +1064,7 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>304</y>
+         <y>262</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -1077,7 +1077,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>304</y>
+         <y>262</y>
          <width>15</width>
          <height>16</height>
         </rect>
@@ -1090,7 +1090,7 @@
        <property name="geometry">
         <rect>
          <x>72</x>
-         <y>214</y>
+         <y>203</y>
          <width>16</width>
          <height>16</height>
         </rect>
@@ -1109,7 +1109,7 @@
        <property name="geometry">
         <rect>
          <x>72</x>
-         <y>196</y>
+         <y>186</y>
          <width>16</width>
          <height>16</height>
         </rect>
@@ -1128,7 +1128,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>198</y>
+         <y>188</y>
          <width>67</width>
          <height>13</height>
         </rect>
@@ -1144,7 +1144,7 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>215</y>
+         <y>204</y>
          <width>67</width>
          <height>13</height>
         </rect>
@@ -1162,7 +1162,7 @@
          <x>2</x>
          <y>78</y>
          <width>96</width>
-         <height>72</height>
+         <height>66</height>
         </rect>
        </property>
        <property name="title">
@@ -1194,7 +1194,7 @@
         <property name="geometry">
          <rect>
           <x>2</x>
-          <y>46</y>
+          <y>42</y>
           <width>94</width>
           <height>22</height>
          </rect>
@@ -1222,7 +1222,7 @@
         <property name="geometry">
          <rect>
           <x>2</x>
-          <y>29</y>
+          <y>25</y>
           <width>90</width>
           <height>19</height>
          </rect>
@@ -1377,7 +1377,7 @@
        <property name="geometry">
         <rect>
          <x>3</x>
-         <y>170</y>
+         <y>164</y>
          <width>94</width>
          <height>21</height>
         </rect>
@@ -1385,6 +1385,71 @@
        <property name="text">
         <string>CALIBRATION</string>
        </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBoxAllPM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>277</y>
+         <width>96</width>
+         <height>47</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>All PMs histograms</string>
+       </property>
+       <widget class="QPushButton" name="buttonStartAll">
+        <property name="geometry">
+         <rect>
+          <x>1</x>
+          <y>12</y>
+          <width>47</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>START</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonStopAll">
+        <property name="geometry">
+         <rect>
+          <x>47</x>
+          <y>12</y>
+          <width>47</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>STOP</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonResetAll">
+        <property name="geometry">
+         <rect>
+          <x>47</x>
+          <y>29</y>
+          <width>47</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="buttonRestartAll">
+        <property name="geometry">
+         <rect>
+          <x>1</x>
+          <y>29</y>
+          <width>47</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Restart</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>

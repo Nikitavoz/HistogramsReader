@@ -204,6 +204,10 @@ public:
         });
         connect(&FEE, &FITelectronics::SPIlinksStatusUpdated, this, &MainWindow::updateBoardsList);
         connect(&FEE, &FITelectronics::statusReady, this, &MainWindow::updateStatus);
+        connect(ui->  buttonStartAll, &QPushButton::clicked, &FEE, &FITelectronics::  startHistAllPMs);
+        connect(ui->   buttonStopAll, &QPushButton::clicked, &FEE, &FITelectronics::   stopHistAllPMs);
+        connect(ui->  buttonResetAll, &QPushButton::clicked, &FEE, &FITelectronics::  resetHistAllPMs);
+        connect(ui->buttonRestartAll, &QPushButton::clicked, &FEE, &FITelectronics::restartHistAllPMs);
         ui->labelValueTime->setText("0.0");
         ui->labelValueSpeed->setText("0.0");
         ui->labelValueMax->setText("0");

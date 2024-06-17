@@ -285,6 +285,24 @@ public slots:
 		if (iBd == 0) setBit(10,			 0x0E, false); //TCM
 		else		  setBit(13, iBd*0x200 + 0x7E, false); //PM
 	}
+    void resetHistAllPMs() {
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(0xFFFFFFFF, 1<<13));
+        if (transceive()) sync();
+    }
+    void startHistAllPMs() {
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(0xFFFFFFFF, 1<<15));
+        if (transceive()) sync();
+    }
+    void stopHistAllPMs() {
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(~(1<<15), 0x00000000));
+        if (transceive()) sync();
+    }
+    void restartHistAllPMs() {
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(~(1<<15), 0x00000000)); //stop hist
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(0xFFFFFFFF, 1<<13)); //reset hist
+        for (quint8 iPM=0; iPM<20; ++iPM) if (maskSPI & 1<<iPM) addTransaction(RMWbits, (iPM+1)*0x200 + 0x7E, masks(0xFFFFFFFF, 1<<15)); //start hist
+        if (transceive()) sync();
+    }
     void switchHistogramming(bool on) { if (on) setBit(15, iBd*0x200 + 0x7E); else clearBit(15, iBd*0x200 + 0x7E); }
     void switchBCfilter     (bool on) { if (on) setBit(12, iBd*0x200 + 0x7E); else clearBit(12, iBd*0x200 + 0x7E); }
     void setBC(int id) { if (id >= 0 && id < 0xDEC) writeNbits(iBd*0x200 + 0x7E, id, 12); }
