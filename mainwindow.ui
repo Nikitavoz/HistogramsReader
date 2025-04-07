@@ -300,7 +300,7 @@
             <string>on</string>
            </property>
           </widget>
-          <widget class="Switch" name="switchTriggersLoggingTCM">
+          <widget class="Switch" name="switchTriggersLoggingTCM" native="true">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -315,10 +315,10 @@
            <property name="toolTip">
             <string>Log to files this trigger counts and rates for each BC every second</string>
            </property>
-           <property name="text">
+           <property name="text" stdset="0">
             <string/>
            </property>
-           <property name="SwitchOnClick">
+           <property name="SwitchOnClick" stdset="0">
             <bool>true</bool>
            </property>
           </widget>
@@ -871,7 +871,7 @@
       <property name="title">
        <string/>
       </property>
-      <widget class="Switch" name="switchHistorgammingPM">
+      <widget class="Switch" name="switchHistorgammingPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -880,10 +880,10 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="text">
+       <property name="text" stdset="0">
         <string/>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>
@@ -903,7 +903,7 @@
       <widget class="QLabel" name="labelFilterPM">
        <property name="geometry">
         <rect>
-         <x>2</x>
+         <x>1</x>
          <y>248</y>
          <width>43</width>
          <height>16</height>
@@ -913,7 +913,7 @@
         <string>BC filter</string>
        </property>
       </widget>
-      <widget class="Switch" name="switchFilterPM">
+      <widget class="Switch" name="switchFilterPM" native="true">
        <property name="geometry">
         <rect>
          <x>17</x>
@@ -922,7 +922,7 @@
          <height>18</height>
         </rect>
        </property>
-       <property name="SwitchOnClick">
+       <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
        </property>
       </widget>

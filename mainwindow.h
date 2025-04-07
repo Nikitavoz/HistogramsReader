@@ -94,7 +94,8 @@ public:
         settings(QCoreApplication::applicationName() + ".ini", QSettings::IniFormat)
     {
         ui->setupUi(this); //UI initialization
-        setWindowTitle(QCoreApplication::applicationName() + " v" + QCoreApplication::applicationVersion());
+        //setWindowTitle(QCoreApplication::applicationName() + " v" + QCoreApplication::applicationVersion());
+        setWindowTitle(QCoreApplication::applicationName() + " v" + APP_VERSION);
         allWidgets = ui->centralwidget->findChildren<QWidget *>();
         PMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*PM"));
         TCMwidgets = ui->groupBoxControl->findChildren<QWidget *>(QRegularExpression(".*TCM"));
@@ -187,7 +188,9 @@ public:
            QComboBox *b = ui->comboBoxSelectableHistogramTCM;
 		   b->                               setItemData(0,                    "disabled", Qt::DisplayRole); b->setItemData(0,                                   "", Qt::ToolTipRole);
 		   for (quint8 i=1; i<=15; ++i) { b->setItemData(i, COUNTERS[sd == FV0][i-1].name, Qt::DisplayRole); b->setItemData(i, COUNTERS[sd == FV0][i-1].description, Qt::ToolTipRole); }
+           H[hTrig][2]->name = COUNTERS[sd == FV0][1].name;
 		   ui->radButADC->setText(sd == FV0 ? "ADC (≈83fC)" : "ADC (≈43fC)");
+//           ui->comboBoxSelectableHistogramTCM->
         });
         connect(&FEE, &IPbusTarget::error, this, [=](QString message, errorType et) {
             ui->switchTriggersLoggingTCM->setChecked(false);
