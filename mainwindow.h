@@ -32,7 +32,10 @@ public:
         Red0 = QPixmap(":/0R.png"), //not OK
         Red1 = QPixmap(":/1R.png"), //not OK
         b0icon = QPixmap(10,10), b1icon = b0icon;
-    QFont regularValueFont = QFont("Consolas", 10, QFont::Normal), tickFont = QFont("sans serif");
+    // QFont regularValueFont = QFont("Consolas", 10, QFont::Normal),
+    QFont regularValueFont = QFont("Tahoma", 8, QFont::Normal),
+//        tickFont = QFont("sans serif");
+        tickFont = QFont("Tahoma", 8, QFont::Normal);
     QString
         OKstyle    = QString::asprintf("background-color: rgba(%d, %d, %d, 63)", OKcolor   .red(), OKcolor   .green(), OKcolor   .blue()),
         notOKstyle = QString::asprintf("background-color: rgba(%d, %d, %d, 63)", notOKcolor.red(), notOKcolor.green(), notOKcolor.blue());
@@ -105,16 +108,18 @@ public:
         recheck->setShortcutContext(Qt::ApplicationShortcut);
         ui->tabWidget->addAction(recheck);
 //initial scaling (a label with fontsize 10 (Calibri) has pixelsize of 13 without system scaling and e.g. 20 at 150% scaling so widgets size should be recalculated)
-        fontSize_px = ui->centralwidget->fontInfo().pixelSize();
-        if (fontSize_px > 13) { //not default pixelsize for font of size 10
-            double f = fontSize_px / 13.;
+        double defaultFontSize_px = 11.;
+        fontSize_px = ui->labelValueTime->fontInfo().pixelSize();
+        qDebug()<<ui->labelValueIPaddress->fontInfo().pixelSize();
+        if (fontSize_px > defaultFontSize_px) {
+            double f = fontSize_px / defaultFontSize_px;
             resize(size()*f); //mainWindow
             setMinimumSize(minimumSize()*f);
             foreach (QWidget *w, allWidgets) { w->resize(w->size()*f); w->move(w->pos()*f); }
             ui->groupBoxControl->setMinimumSize(ui->groupBoxControl->minimumSize()*f);
             ui->groupBoxTarget ->setMinimumSize(ui->groupBoxTarget ->minimumSize()*f);
             ui->groupBoxFile   ->setMinimumSize(ui->groupBoxFile   ->minimumSize()*f);
-            tickFont.setPixelSize(12*f);
+            tickFont.setPixelSize(fontSize_px);
         }
         foreach(QCustomPlot *p, ui->Triggers->findChildren<QCustomPlot *>()) H[hTrig].append(new Histogram(p, H[hTrig].length(), hTrig));
         foreach(QCustomPlot *p, ui->Time    ->findChildren<QCustomPlot *>()) H[hTime].append(new Histogram(p, H[hTime].length(), hTime));
@@ -132,7 +137,7 @@ public:
                 t->setLayer("axes");
                 t->setPositionAlignment(Qt::AlignBottom|Qt::AlignLeft);
                 t->position->setType(QCPItemPosition::ptAbsolute);
-                t->position->setCoords(1.6 * fontSize_px, fontSize_px);
+                t->position->setCoords(1.9 * fontSize_px, fontSize_px);
                 t->setClipToAxisRect(false);
                 t->setFont(regularValueFont);
                 t->setBrush(Qt::white);
@@ -143,7 +148,7 @@ public:
                 r->setBackgroundScaled(false);
                 r->setBackground(QBrush(QColor(0, 0, 0, 30)));
                 r->setAutoMargins(QCP::msNone);
-                r->setMargins(QMargins(1.6 * fontSize_px, fontSize_px + 2, 0.4 * fontSize_px, 2.2 * fontSize_px));
+                r->setMargins(QMargins(1.9 * fontSize_px, fontSize_px + 1, 0.5 * fontSize_px, 2.6 * fontSize_px));
             QCPAxis *y = h->plot->yAxis;
                 y->setTickLabelFont(tickFont);
                 y->setTicker(linTicker);
@@ -156,7 +161,7 @@ public:
                 y->setLabelPadding(0);
                 y->setPadding(0);
             QCPAxis *x = h->plot->xAxis;
-                x->setTickLabelFont(tickFont);
+                //x->setTickLabelFont(tickFont);
                 x->setTicker(binTicker);
                 x->grid()->setPen(QPen(QColor(140, 140, 140, 80), 1));
                 x->grid()->setZeroLinePen(Qt::NoPen);
@@ -237,6 +242,7 @@ public:
         FEE.reconnect();
         ui->switchTriggersLoggingTCM->setEnabled(false);
         _calibrationDialog = new CalibrationParameterDialog(FEE.IPaddress, ADCUperMIP, 7200, this);
+        qDebug()<<H[hTrig].at(1)->plot->xAxis->tickLabelFont();
     }
 
     ~MainWindow() {
@@ -433,6 +439,9 @@ public slots:
         ui->tabWidget->setCurrentIndex(curType);
         showData();
     }
+    void on_buttonSaveAllPMs_clicked() {
+        QMessageBox::information(this, "Be patient", "This will take several seconds. Do not interrupt.");
+    }
     void on_radioAdjustable_toggled(bool checked) { foreach(QList<Histogram *> group, H) foreach(Histogram *h, group) h->plot->setInteractions(checked ? QCP::iRangeDrag | QCP::iRangeZoom : QCP::iNone); }
     void on_radioFullRange_toggled() { if (ui->radioFullRange->isChecked()) { foreach(Histogram *h, H[curType]) updatePlot(h); } }
     void on_radioThreshold_toggled() { if (ui->radioThreshold->isChecked()) { foreach(Histogram *h, H[curType]) updatePlot(h); } }
@@ -493,7 +502,7 @@ public slots:
     }
     void changeUnit(QList<MainWindow::Histogram *> &group, double newBinWidth) {
         bool defaultBin = newBinWidth == 1.;
-        QMargins m = group.first()->plot->axisRect()->margins(); m.setBottom((defaultBin ? 2.2 : 1.) * fontSize_px);
+        QMargins m = group.first()->plot->axisRect()->margins(); m.setBottom((defaultBin ? 2.6 : 1.2) * fontSize_px);
         foreach(Histogram *h, group) {
             QCPRange newRange = h->plot->xAxis->range() * newBinWidth/h->bars[0]->width();
             foreach(QCPBars *b, h->bars) b->setWidth(newBinWidth);

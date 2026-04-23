@@ -36,7 +36,7 @@ LIBS += -L"$$PWD/../DIM/bin" -ldim
 RESOURCES += \
     ../!images/img.qrc
 
-VERSION = 3.9.1
+VERSION = 3.9.2
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 # Default rules for deployment.

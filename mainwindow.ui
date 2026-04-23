@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>1142</width>
-    <height>704</height>
+    <height>696</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>1142</width>
-    <height>704</height>
+    <height>696</height>
    </size>
   </property>
   <property name="font">
    <font>
-    <family>Calibri</family>
-    <pointsize>10</pointsize>
+    <family>Tahoma</family>
+    <pointsize>8</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -44,6 +44,12 @@
    <locale language="English" country="World"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">QCheckBox, QRadioButton {spacing: 3}</string>
    </property>
@@ -68,8 +74,13 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>55</height>
+        <height>46</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
       </property>
       <property name="title">
        <string>Target</string>
@@ -80,8 +91,17 @@
          <x>46</x>
          <y>-1</y>
          <width>50</width>
-         <height>21</height>
+         <height>17</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">padding-bottom: 2px</string>
        </property>
        <property name="text">
         <string>Change</string>
@@ -91,19 +111,18 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>19</y>
+         <y>12</y>
          <width>94</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>10</pointsize>
+         <family>Tahoma</family>
         </font>
        </property>
        <property name="text">
-        <string>172.020.075.180</string>
+        <string>198.176.254.230</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -113,15 +132,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>36</y>
+         <y>29</y>
          <width>96</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>10</pointsize>
+         <family>Tahoma</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="styleSheet">
@@ -138,10 +157,20 @@
     </item>
     <item row="0" column="1" rowspan="4">
      <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
       <widget class="QWidget" name="Triggers">
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <attribute name="title">
         <string>Triggers per BC</string>
        </attribute>
@@ -163,14 +192,24 @@
         </property>
         <item>
          <widget class="QCustomPlot" name="plotTrigSelectableHist" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
           <widget class="QComboBox" name="comboBoxSelectableHistogramTCM">
            <property name="geometry">
             <rect>
              <x>20</x>
-             <y>-1</y>
+             <y>-2</y>
              <width>101</width>
              <height>15</height>
             </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+            </font>
            </property>
            <property name="currentText">
             <string notr="true">disabled</string>
@@ -272,10 +311,15 @@
            <property name="geometry">
             <rect>
              <x>396</x>
-             <y>-2</y>
+             <y>-4</y>
              <width>88</width>
              <height>16</height>
             </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+            </font>
            </property>
            <property name="toolTip">
             <string>Log to files this trigger counts and rates for each BC every second</string>
@@ -288,10 +332,15 @@
            <property name="geometry">
             <rect>
              <x>530</x>
-             <y>-2</y>
+             <y>-4</y>
              <width>15</width>
              <height>16</height>
             </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+            </font>
            </property>
            <property name="toolTip">
             <string>Log to files this trigger counts and rates for each BC every second</string>
@@ -307,10 +356,15 @@
            <property name="geometry">
             <rect>
              <x>500</x>
-             <y>-2</y>
+             <y>-4</y>
              <width>30</width>
              <height>18</height>
             </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+            </font>
            </property>
            <property name="toolTip">
             <string>Log to files this trigger counts and rates for each BC every second</string>
@@ -326,10 +380,15 @@
            <property name="geometry">
             <rect>
              <x>485</x>
-             <y>-2</y>
+             <y>-4</y>
              <width>15</width>
              <height>16</height>
             </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+            </font>
            </property>
            <property name="toolTip">
             <string>Log to files this trigger counts and rates for each BC every second</string>
@@ -341,14 +400,31 @@
          </widget>
         </item>
         <item>
-         <widget class="QCustomPlot" name="plotTrigOrA" native="true"/>
+         <widget class="QCustomPlot" name="plotTrigOrA" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QCustomPlot" name="plotTrigOrC" native="true"/>
+         <widget class="QCustomPlot" name="plotTrigOrC" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Time">
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <attribute name="title">
         <string>Time</string>
        </attribute>
@@ -369,44 +445,121 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <widget class="QCustomPlot" name="plotTimeCh01" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh01" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QCustomPlot" name="plotTimeCh02" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh02" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QCustomPlot" name="plotTimeCh03" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh03" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QCustomPlot" name="plotTimeCh04" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh04" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QCustomPlot" name="plotTimeCh05" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh05" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QCustomPlot" name="plotTimeCh06" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh06" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QCustomPlot" name="plotTimeCh07" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh07" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="3">
-         <widget class="QCustomPlot" name="plotTimeCh08" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh08" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QCustomPlot" name="plotTimeCh09" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh09" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QCustomPlot" name="plotTimeCh10" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh10" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QCustomPlot" name="plotTimeCh11" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh11" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="3">
-         <widget class="QCustomPlot" name="plotTimeCh12" native="true"/>
+         <widget class="QCustomPlot" name="plotTimeCh12" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Charge">
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <attribute name="title">
         <string>Charge</string>
        </attribute>
@@ -427,40 +580,112 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <widget class="QCustomPlot" name="plotChrgCh01" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh01" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QCustomPlot" name="plotChrgCh02" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh02" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QCustomPlot" name="plotChrgCh03" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh03" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QCustomPlot" name="plotChrgCh04" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh04" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QCustomPlot" name="plotChrgCh05" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh05" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QCustomPlot" name="plotChrgCh06" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh06" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QCustomPlot" name="plotChrgCh07" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh07" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="1" column="3">
-         <widget class="QCustomPlot" name="plotChrgCh08" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh08" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QCustomPlot" name="plotChrgCh09" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh09" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QCustomPlot" name="plotChrgCh10" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh10" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QCustomPlot" name="plotChrgCh11" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh11" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item row="2" column="3">
-         <widget class="QCustomPlot" name="plotChrgCh12" native="true"/>
+         <widget class="QCustomPlot" name="plotChrgCh12" native="true">
+          <property name="font">
+           <font>
+            <family>Tahoma</family>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -468,6 +693,11 @@
     </item>
     <item row="3" column="0">
      <widget class="QGroupBox" name="groupBoxView">
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
+      </property>
       <property name="title">
        <string>View settings</string>
       </property>
@@ -480,6 +710,11 @@
          <height>47</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="title">
         <string/>
        </property>
@@ -491,6 +726,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>Both (0+1)</string>
@@ -507,6 +747,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string notr="true">ADC0</string>
@@ -526,6 +771,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string notr="true">ADC1</string>
@@ -547,6 +797,11 @@
          <height>47</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="title">
         <string>y-axis scale</string>
        </property>
@@ -558,6 +813,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>logarithmic</string>
@@ -574,6 +834,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>linear</string>
@@ -592,6 +857,11 @@
          <height>81</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="title">
         <string>x-axis</string>
        </property>
@@ -603,6 +873,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>≥ threshold:</string>
@@ -620,6 +895,11 @@
           <height>14</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>full range</string>
         </property>
@@ -636,6 +916,11 @@
           <height>14</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>adjustable</string>
         </property>
@@ -651,6 +936,11 @@
           <width>94</width>
           <height>22</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -681,6 +971,11 @@
          <height>60</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="title">
         <string>Charge units</string>
        </property>
@@ -692,6 +987,11 @@
           <width>41</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>mV</string>
@@ -709,6 +1009,11 @@
           <height>14</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>ADC (≈43fC)</string>
         </property>
@@ -725,6 +1030,11 @@
           <height>14</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>MIP</string>
         </property>
@@ -740,6 +1050,11 @@
           <width>45</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>Tune...</string>
@@ -758,6 +1073,11 @@
          <height>45</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="title">
         <string>Time units</string>
        </property>
@@ -769,6 +1089,11 @@
           <width>41</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>ns</string>
@@ -785,6 +1110,11 @@
           <width>86</width>
           <height>14</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>TDC (≈13ps)</string>
@@ -804,6 +1134,11 @@
           <width>52</width>
           <height>19</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="toolTip">
          <string notr="true">read data each second</string>
@@ -826,8 +1161,13 @@
       <property name="minimumSize">
        <size>
         <width>100</width>
-        <height>35</height>
+        <height>54</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
       </property>
       <property name="title">
        <string>Data file</string>
@@ -841,8 +1181,13 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="text">
-        <string>Load...</string>
+        <string>Load…</string>
        </property>
       </widget>
       <widget class="QPushButton" name="buttonSave">
@@ -854,8 +1199,31 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
        <property name="text">
-        <string>Save...</string>
+        <string>Save…</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="buttonSaveAllPMs">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>32</y>
+         <width>93</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>Save from all PMs</string>
        </property>
       </widget>
      </widget>
@@ -865,8 +1233,13 @@
       <property name="minimumSize">
        <size>
         <width>100</width>
-        <height>326</height>
+        <height>308</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
       </property>
       <property name="title">
        <string/>
@@ -875,10 +1248,15 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>228</y>
+         <y>211</y>
          <width>30</width>
          <height>18</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text" stdset="0">
         <string/>
@@ -891,10 +1269,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>215</y>
+         <y>198</y>
          <width>88</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>Histogramming:</string>
@@ -904,10 +1287,15 @@
        <property name="geometry">
         <rect>
          <x>1</x>
-         <y>248</y>
+         <y>231</y>
          <width>43</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>BC filter</string>
@@ -917,10 +1305,15 @@
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>262</y>
+         <y>245</y>
          <width>31</width>
          <height>18</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="SwitchOnClick" stdset="0">
         <bool>false</bool>
@@ -930,10 +1323,15 @@
        <property name="geometry">
         <rect>
          <x>3</x>
-         <y>144</y>
+         <y>164</y>
          <width>94</width>
          <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>RESET</string>
@@ -943,10 +1341,15 @@
        <property name="geometry">
         <rect>
          <x>45</x>
-         <y>245</y>
+         <y>228</y>
          <width>54</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="prefix">
         <string/>
@@ -972,10 +1375,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <family>Tahoma</family>
         </font>
        </property>
        <property name="text">
@@ -990,6 +1390,11 @@
          <width>60</width>
          <height>19</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="currentIndex">
         <number>5</number>
@@ -1038,10 +1443,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>228</y>
+         <y>211</y>
          <width>15</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>off</string>
@@ -1051,10 +1461,15 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>228</y>
+         <y>211</y>
          <width>15</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>on</string>
@@ -1064,10 +1479,15 @@
        <property name="geometry">
         <rect>
          <x>47</x>
-         <y>262</y>
+         <y>245</y>
          <width>15</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>on</string>
@@ -1077,10 +1497,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>262</y>
+         <y>245</y>
          <width>15</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string>off</string>
@@ -1089,11 +1514,16 @@
       <widget class="QLabel" name="labelIconClockSyncPM">
        <property name="geometry">
         <rect>
-         <x>72</x>
-         <y>203</y>
+         <x>82</x>
+         <y>187</y>
          <width>16</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string/>
@@ -1108,11 +1538,16 @@
       <widget class="QLabel" name="labelIconTriggerSyncPM">
        <property name="geometry">
         <rect>
-         <x>72</x>
+         <x>48</x>
          <y>186</y>
          <width>16</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="text">
         <string/>
@@ -1127,14 +1562,22 @@
       <widget class="QLabel" name="labelTriggerSyncPM">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>188</y>
-         <width>67</width>
+         <x>34</x>
+         <y>187</y>
+         <width>14</width>
          <height>13</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>trigger sync</string>
+        <string notr="true">trg</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1143,14 +1586,22 @@
       <widget class="QLabel" name="labelClockSyncPM">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>204</y>
-         <width>67</width>
+         <x>70</x>
+         <y>187</y>
+         <width>12</width>
          <height>13</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>clock sync</string>
+        <string notr="true">clk</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1160,10 +1611,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>78</y>
+         <y>98</y>
          <width>96</width>
          <height>66</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="title">
         <string>Max bin count</string>
@@ -1179,8 +1635,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Consolas</family>
-          <pointsize>10</pointsize>
+          <family>Tahoma</family>
+          <pointsize>8</pointsize>
          </font>
         </property>
         <property name="text">
@@ -1198,6 +1654,11 @@
           <width>94</width>
           <height>22</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1227,6 +1688,11 @@
           <height>19</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>autoreset on:</string>
         </property>
@@ -1236,10 +1702,15 @@
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>20</y>
+         <y>40</y>
          <width>96</width>
          <height>59</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="title">
         <string>Data read</string>
@@ -1252,6 +1723,11 @@
           <width>45</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>Read</string>
@@ -1269,6 +1745,11 @@
           <height>19</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="toolTip">
          <string notr="true">read data each second</string>
         </property>
@@ -1279,11 +1760,16 @@
        <widget class="QLabel" name="labelms">
         <property name="geometry">
          <rect>
-          <x>56</x>
+          <x>66</x>
           <y>12</y>
-          <width>40</width>
+          <width>30</width>
           <height>12</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>ms</string>
@@ -1292,11 +1778,16 @@
        <widget class="QLabel" name="labelMbitps">
         <property name="geometry">
          <rect>
-          <x>56</x>
+          <x>66</x>
           <y>25</y>
-          <width>40</width>
+          <width>30</width>
           <height>12</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>Mbit/s</string>
@@ -1305,20 +1796,19 @@
        <widget class="QLabel" name="labelValueTime">
         <property name="geometry">
          <rect>
-          <x>15</x>
+          <x>20</x>
           <y>12</y>
-          <width>37</width>
+          <width>42</width>
           <height>12</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <family>Consolas</family>
-          <pointsize>10</pointsize>
+          <family>Tahoma</family>
          </font>
         </property>
         <property name="text">
-         <string>101.1</string>
+         <string>18101.1</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1327,16 +1817,15 @@
        <widget class="QLabel" name="labelValueSpeed">
         <property name="geometry">
          <rect>
-          <x>15</x>
+          <x>20</x>
           <y>25</y>
-          <width>37</width>
+          <width>42</width>
           <height>12</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <family>Consolas</family>
-          <pointsize>10</pointsize>
+          <family>Tahoma</family>
          </font>
         </property>
         <property name="text">
@@ -1349,11 +1838,16 @@
        <widget class="QLabel" name="labelAt">
         <property name="geometry">
          <rect>
-          <x>2</x>
+          <x>7</x>
           <y>25</y>
           <width>12</width>
           <height>12</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>at</string>
@@ -1362,38 +1856,35 @@
        <widget class="QLabel" name="labelIn">
         <property name="geometry">
          <rect>
-          <x>2</x>
+          <x>7</x>
           <y>12</y>
           <width>12</width>
           <height>12</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>in</string>
         </property>
        </widget>
       </widget>
-      <widget class="QPushButton" name="pushButtonCalibrationPM">
-       <property name="geometry">
-        <rect>
-         <x>3</x>
-         <y>164</y>
-         <width>94</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>CALIBRATION</string>
-       </property>
-      </widget>
       <widget class="QGroupBox" name="groupBoxAllPM">
        <property name="geometry">
         <rect>
          <x>2</x>
-         <y>277</y>
+         <y>260</y>
          <width>96</width>
          <height>47</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
        </property>
        <property name="title">
         <string>All PMs histograms</string>
@@ -1406,6 +1897,11 @@
           <width>47</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>START</string>
@@ -1420,6 +1916,11 @@
           <height>18</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>STOP</string>
         </property>
@@ -1432,6 +1933,11 @@
           <width>47</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
         </property>
         <property name="text">
          <string>Reset</string>
@@ -1446,10 +1952,54 @@
           <height>18</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Tahoma</family>
+         </font>
+        </property>
         <property name="text">
          <string>Restart</string>
         </property>
        </widget>
+      </widget>
+      <widget class="QLabel" name="labelSyncOK_PM">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>187</y>
+         <width>29</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>Sync:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButtonCalibrationPM">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>21</y>
+         <width>94</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Tahoma</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>CALIBRATION</string>
+       </property>
       </widget>
      </widget>
     </item>

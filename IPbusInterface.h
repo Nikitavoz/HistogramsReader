@@ -40,6 +40,7 @@ public:
         });
         qsocket->setProxy(QNetworkProxy::NoProxy);
         if (!qsocket->bind(QHostAddress::AnyIPv4, localport)) qsocket->bind(QHostAddress::AnyIPv4);
+        qsocket->setSocketOption(QAbstractSocket::ReceiveBufferSizeSocketOption, 0x100000); //1MB buffer
         updateTimer->start(updatePeriod_ms);
     }
 
